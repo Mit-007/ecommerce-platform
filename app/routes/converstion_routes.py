@@ -1,19 +1,14 @@
+from fastapi import APIRouter
 from uuid import UUID
-
-from fastapi import APIRouter, HTTPException
-
 from app.core.logger import logger
+from fastapi import APIRouter, HTTPException
 from app.database.repositories.converstion_repositories import (
     get_all_conversations_by_customer,
 )
 
-router = APIRouter(
-    prefix="/conversations",
-    tags=["Conversations"],
-)
+router = APIRouter(prefix="/customer", tags=["converstion"])
 
-
-@router.get("/{customer_id}")
+@router.get("/{customer_id}/conversations")
 def get_customer_conversations(customer_id: UUID):
     """
     Get all conversations for a customer.

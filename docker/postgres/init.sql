@@ -20,9 +20,11 @@ CREATE TABLE customer (
 -- ===== INVOICE TABLE =====
 CREATE TABLE invoice (
     invoice_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID NOT NULL,
     invoice_number VARCHAR(255) NOT NULL UNIQUE,
     status invoice_status NOT NULL DEFAULT 'draft',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE,
     CONSTRAINT invoice_number_length CHECK (length(invoice_number) > 0)
 );
 
@@ -67,7 +69,7 @@ CREATE TABLE tracking_event (
 CREATE TABLE document (
     document_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     original_text TEXT,
-    embedding_vector vector(1536),
+    embedding_vector vector(3072),
     metadata JSONB,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

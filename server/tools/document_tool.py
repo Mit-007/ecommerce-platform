@@ -41,7 +41,7 @@ def register_document_tools(mcp: FastMCP):
 
             chunks = create_chunks(
                 text=text,
-                chunk_size=2000,
+                chunk_size=1000,
                 chunk_overlap=200,
             )
 
@@ -147,105 +147,5 @@ def register_document_tools(mcp: FastMCP):
             # 6. Release database connection
             # --------------------------------
 
-            if conn:
-                release_db_connection(conn, cur)
-
-
-    @mcp.tool()
-    def retrieve_top_chunks(
-        query: str,
-        top_n: int = 5,
-    ) -> dict:
-        """
-        Retrieve the top N most relevant document chunks
-        from PostgreSQL using pgvector cosine similarity.
-        """
- 
-        if not query or not query.strip():
-            raise ValueError("Query cannot be empty.")
- 
-        if top_n <= 0:
-            raise ValueError("top_n must be greater than 0.")
- 
-        # Prevent unnecessarily large queries
-        top_n = min(top_n, 20)
- 
-        conn = None
-        cur = None
- 
-        try:
-            logger.info(f"Retrieving top {top_n} chunks for query: {query[:100]}...")
- 
-            # ================================
-            # 1. GENERATE QUERY EMBEDDING
-            # ================================
- 
-            query_embedding = generate_embedding(query)
- 
-            embedding_string = "[" + ",".join(
-                str(value) for value in query_embedding
-            ) + "]"
- 
-            # ================================
-            # 2. VECTOR SIMILARITY SEARCH
-            # ================================
- 
-            conn, cur = get_db_connection()
- 
-            cur.execute(
-                """
-                SELECT
-                    document_id,
-                    original_text,
-                    metadata,
-                    created_at,
-                    1 - (embedding_vector <=> %s::vector) AS similarity
-                FROM document
-                WHERE embedding_vector IS NOT NULL
-                ORDER BY embedding_vector <=> %s::vector
-                LIMIT %s
-                """,
-                (
-                    embedding_string,
-                    embedding_string,
-                    top_n,
-                ),
-            )
- 
-            rows = cur.fetchall()
- 
-            # ================================
-            # 3. CONVERT RESULTS
-            # ================================
- 
-            chunks = []
- 
-            for row in rows:
-                chunks.append({
-                    "document_id": str(row[0]),
-                    "text": row[1],
-                    "metadata": row[2],
-                    "created_at": row[3].isoformat() if row[3] else None,
-                    "similarity_score": float(row[4]) if row[4] else 0.0,
-                })
- 
-            logger.info(f"Retrieved {len(chunks)} chunks for query")
- 
-            # ================================
-            # 4. RETURN RESULTS
-            # ================================
- 
-            return {
-                "success": True,
-                "query": query,
-                "chunks_found": len(chunks),
-                "chunks": chunks,
-            }
- 
-        except Exception as e:
-            logger.exception(f"Failed to retrieve document chunks: {e}")
-            raise
- 
-        finally:
             if conn:
                 release_db_connection(conn, cur)

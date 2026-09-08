@@ -1,7 +1,7 @@
 def create_chunks(
     text: str,
-    chunk_size: int = 200,
-    chunk_overlap: int = 20,
+    chunk_size: int = 1000,
+    chunk_overlap: int = 100,
 ) -> list[str]:
 
     if not text:

@@ -19,7 +19,7 @@ def init_db_pool():
                 password=DB_PASSWORD,
             )
 
-            logger.debug("Database connection pool initialized successfully.")
+            logger.info("Database connection pool initialized successfully.")
 
     except Exception as e:
         logger.exception(f"Failed to initialize database connection pool: {e}")

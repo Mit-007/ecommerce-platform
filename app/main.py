@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.connection import init_db_pool, close_db_pool
-from app.routes import support_route, auth_routes, order_routes, converstion_routes
+from app.routes import support_route, auth_routes, order_routes,customer_routes , invoice_routes ,tracking_routes ,converstion_routes
 from app.services.llm_service import initialize_llm
 from app.core.logger import logger
 
@@ -60,5 +60,8 @@ app.add_middleware(
 # Routes
 app.include_router(support_route.router)
 app.include_router(auth_routes.router)
-# app.include_router(order_routes.router)
+app.include_router(customer_routes.router)
+app.include_router(invoice_routes.router)
+app.include_router(order_routes.router)
+app.include_router(tracking_routes.router)
 app.include_router(converstion_routes.router)

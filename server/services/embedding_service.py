@@ -10,10 +10,10 @@ client = genai.Client(api_key=GOOGLE_API_KEY)
 def generate_embedding(text: str) -> list[float]:
     try:
         response = client.models.embed_content(
-            model="gemini-embedding-001",
+            model="gemini-embedding-2",
             contents=text,
             config=types.EmbedContentConfig(
-                output_dimensionality=1536,
+                output_dimensionality=3072,
             ),
         )
 

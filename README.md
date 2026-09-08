@@ -1,3 +1,10 @@
+<div align="center">
+
+<img src="https://img.shields.io/badge/STATUS-🚧_WORK_IN_PROGRESS-white?style=for-the-badge" alt="Status: Work in Progress">
+
+</div>
+
+---
 # E-Commerce AI Support Agent
 ## Database Schema
 

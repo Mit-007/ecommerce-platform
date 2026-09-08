@@ -26,8 +26,9 @@ async def initialize_mcp():
             f"Successfully connected to MCP server. "
             f"Loaded {len(_mcp_tools)} tools"
         )
-
+        logger.info("------------tool_list-------------------")
         for tool in _mcp_tools:
+            logger.info(tool.name)
             _mcp_tools_dict[tool.name] = tool
 
         return _mcp_tools

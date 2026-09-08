@@ -74,8 +74,6 @@ async def tool_node(state: AgentState) -> AgentState:
     try:
         tools_dict = get_mcp_tools_dict()
 
-        tool_results = []
-
         for tool_call in state["tool_calls"]:
 
             tool_name = tool_call["name"]

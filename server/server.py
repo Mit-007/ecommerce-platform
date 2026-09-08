@@ -10,13 +10,19 @@ from server.tools import (
     search_tool as ST,
     support_ticket_tool as TT
 )
-
+from server.core.logger import logger
 
 @asynccontextmanager
 async def lifespan(server: FastMCP):
 
-    # Startup
-    init_db_pool()
+    try:
+        logger.info("Initializing database connection pool...")
+        init_db_pool()
+        logger.info("Database connection pool initialized")
+        
+    except Exception as e:
+        logger.exception(f"Failed to initialize database pool: {e}")
+        raise
 
     try:
         yield
@@ -35,7 +41,7 @@ mcp = FastMCP(
 # Register MCP tools
 DT.register_document_tools(mcp)
 OT.register_document_tools(mcp)
-# ST.register_document_tools(mcp)
+ST.register_search_tools(mcp)
 TT.register_document_tools(mcp)
 
 

@@ -1,13 +1,13 @@
 from fastapi import APIRouter
-from app.database.repositories.user_repositories import create_new_customer,fetch_password_by_email
+from app.database.repositories.customer_repositories import create_new_customer,fetch_password_by_email
 from app.utils.jwt import create_access_token,create_refresh_token,refresh_access_token
 from app.services.hashing import verify_password 
 from app.model.auth_routes_schema import RefreshTokenRequest
 
-router = APIRouter(prefix="", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/auth/register")
+@router.post("/register")
 def register_new_custmer(name,email,password):
     try:
         new_customer = create_new_customer(name,email,password)
@@ -18,7 +18,7 @@ def register_new_custmer(name,email,password):
             "message" : "not crate user !!"
         }
 
-@router.post("/auth/login")
+@router.post("/login")
 def login_user(email,password):
     try:
         customer_data = fetch_password_by_email(email)

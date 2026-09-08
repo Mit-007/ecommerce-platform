@@ -39,17 +39,8 @@ async def call_ai_agent(request: AgentRequest):
             "previous_chat": past_converstion,
         }
 
-        config = {
-            "configurable": {
-                "thread_id": conversation_id or "thread-1"
-            }
-        }
-
         # Async LangGraph execution
-        response = await agent.ainvoke(
-            input_state,
-            config=config,
-        )
+        response = await agent.ainvoke(input_state)
 
         new_messages_list = [
             {
