@@ -1,12 +1,15 @@
 import asyncio
 from app.agent.graph import agent
 from app.services.llm_service import initialize_llm
+from app.services.prompt_templete import initialize_prompt_templates
 
+_previous_chat = []
 
 async def main():
 
     await initialize_llm()
-
+    initialize_prompt_templates()
+    
     print("\n🤖 AI Agent Started")
     print("Type 'exit' to quit.\n")
 
@@ -29,9 +32,8 @@ async def main():
             response = await agent.ainvoke(
                 {
                     "question": question,
-                    "tool_calls": [],
                     "tool_call_log": [],
-                    "previous_chat": [],
+                    "previous_chat": _previous_chat,
                 },
             )
 
@@ -54,6 +56,19 @@ async def main():
             print("---------------------\n")
             print(f" <- : {answer}\n\n")
 
+            new_messages_list = [
+                {
+                    "role" : "user",
+                    "content" : question
+                },
+                {
+                    "role" : "AI",
+                    "content" : answer
+                }
+            ]
+
+            _previous_chat.extend(new_messages_list)
+            # print(_previous_chat)
         except Exception as e:
             print(f"\n❌ Error: {e}\n")
 

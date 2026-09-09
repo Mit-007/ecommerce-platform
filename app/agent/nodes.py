@@ -2,7 +2,7 @@ from typing import Literal
 from app.agent.states import AgentState
 from app.core.logger import logger
 from app.services.llm_service import get_llm
-from app.services.chat_agent_prompt import get_chat_agent_prompt
+from app.services.prompt_templete import get_chat_agent_prompt
 from app.client.client import get_mcp_tools_dict
 
 
@@ -17,11 +17,13 @@ async def call_llm(state: AgentState) -> AgentState:
             raise ValueError("Invalid Input, question is empty")
 
         llm_prompt = get_chat_agent_prompt(
-            state["previous_chat"],
-            state["question"],
-            state["tool_call_log"],
+            question=state["question"],
+            previous_chat=state["previous_chat"],
+            tool_call_log=state["tool_call_log"],
         )
-
+        logger.info("------------------------------------------prompt_of_llm-----------------------------------------")
+        logger.info(llm_prompt)
+        logger.info("------------------------------------------------------------------------------------------------")
         llm = get_llm()
 
         if not llm:

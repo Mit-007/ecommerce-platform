@@ -24,14 +24,14 @@ async def call_ai_agent(request: AgentRequest):
         user_question = request.message
         conversation_id = request.conversation_id
 
-        past_converstion = None
+        past_converstion = []
 
-        if conversation_id== None:
-            past_converstion = create_new_conversation(request.customer_id,title=user_question.strip()[:25].rstrip())
-            conversation_id = past_converstion[0]
+        if conversation_id== "":
+            new_converstion = create_new_conversation(request.customer_id,title=user_question.strip()[:25].rstrip())
+            conversation_id = new_converstion[0]
 
         else :
-            past_converstion = get_conversation_by_id(conversation_id)
+            past_converstion = get_conversation_by_id(conversation_id)[3]
 
         input_state = {
             "question": user_question,

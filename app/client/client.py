@@ -29,6 +29,7 @@ async def initialize_mcp():
         logger.info("------------tool_list-------------------")
         for tool in _mcp_tools:
             logger.info(tool.name)
+            # print(tool)
             _mcp_tools_dict[tool.name] = tool
 
         return _mcp_tools
