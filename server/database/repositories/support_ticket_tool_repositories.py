@@ -1,4 +1,4 @@
-from server.database.connection import get_db_connection ,release_db_connection
+from server.database.connection import get_db_connection,release_db_connection
 
 def create_support_ticket_by_order_id(
     order_id: str,

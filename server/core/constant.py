@@ -1,12 +1,11 @@
-# set defult value for top_n chunk retrive
+# set default value for top_n chunk retrieval
 DEFAULT_TOP_N = 5
 
-# set limit for maximum ritrival 
+# set limit for maximum retrieval
 MAXIMUM_RETRIEVAL_CHUNK = 20
 
-# set A  output_dimensionality
+# set output dimensionality for embeddings
 OUTPUT_DIMENSIONALITY = 3072
 
-
-# set embedding model (gemini model)
+# set embedding model (Google Gemini model)
 EMBEDDING_MODEL = "gemini-embedding-2"

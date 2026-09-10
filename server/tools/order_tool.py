@@ -10,7 +10,7 @@ from server.database.repositories.order_tool_repositories import (
 )
 
 
-def register_document_tools(mcp: FastMCP) -> None:
+def register_order_tools(mcp: FastMCP) -> None:
     """Register order management tools with MCP server"""
 
     @mcp.tool()
@@ -31,14 +31,6 @@ def register_document_tools(mcp: FastMCP) -> None:
         logger.info(f"Executing get_order with order_id={request.order_id}")
         
         try:
-            if not request or not request.order_id:
-                logger.warning("Invalid order_id provided to get_order")
-                return ToolResponse(
-                    success=False,
-                    data=None,
-                    error="Invalid order ID provided"
-                )
-            
             result = get_order_by_id(request.order_id)
             
             if not result:
@@ -90,24 +82,6 @@ def register_document_tools(mcp: FastMCP) -> None:
         logger.info(f"Executing list_order_items with order_id={request.order_id}")
         
         try:
-            if not request or not request.order_id:
-                logger.warning("Invalid order_id provided to list_order_items")
-                return ToolResponse(
-                    success=False,
-                    data=None,
-                    error="Invalid order ID provided"
-                )
-            
-            # Verify order exists first
-            order = get_order_by_id(request.order_id)
-            if not order:
-                logger.warning(f"Order not found: {request.order_id}")
-                return ToolResponse(
-                    success=False,
-                    data=None,
-                    error="Order not found"
-                )
-            
             result = list_order_items_by_order_id(request.order_id)
             
             if result is None:
@@ -154,25 +128,7 @@ def register_document_tools(mcp: FastMCP) -> None:
         """
         logger.info(f"Executing track_order with order_id={request.order_id}")
         
-        try:
-            if not request or not request.order_id:
-                logger.warning("Invalid order_id provided to track_order")
-                return ToolResponse(
-                    success=False,
-                    data=None,
-                    error="Invalid order ID provided"
-                )
-            
-            # Verify order exists first
-            order = get_order_by_id(request.order_id)
-            if not order:
-                logger.warning(f"Order not found: {request.order_id}")
-                return ToolResponse(
-                    success=False,
-                    data=None,
-                    error="Order not found"
-                )
-            
+        try: 
             result = track_order_by_id(request.order_id)
             
             if result is None:
@@ -219,14 +175,6 @@ def register_document_tools(mcp: FastMCP) -> None:
         logger.info(f"Executing cancel_order with order_id={request.order_id}")
         
         try:
-            if not request or not request.order_id:
-                logger.warning("Invalid order_id provided to cancel_order")
-                return ToolResponse(
-                    success=False,
-                    data=None,
-                    error="Invalid order ID provided"
-                )
-            
             # Retrieve current order status
             order = get_order_by_id(request.order_id)
             

@@ -1,22 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
-from app.services.chunk_store_service import (
-    chunk_and_store_document,
-)
+from app.model.document_routes_schema import DocumentRequest
+from app.services.chunk_store_service import chunk_and_store_document
 from app.core.logger import logger
 
-
-router = APIRouter(
-    prefix="/documents",
-    tags=["Documents"],
-)
-
-
-class DocumentRequest(BaseModel):
-    text: str = Field(..., min_length=1)
-    file_name: str = Field(..., min_length=1)
-    type: str = Field(..., min_length=1)
-
+router = APIRouter(prefix="/documents",tags=["Documents"],)
 
 @router.post("/upload")
 def upload_document(request: DocumentRequest):
@@ -33,18 +20,26 @@ def upload_document(request: DocumentRequest):
 
         return result
 
+    except HTTPException:
+        raise
+
+    except ConnectionError as e:
+        logger.error(f"Database connection error: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail=str(e),
+        )
+
     except ValueError as e:
-        logger.warning(f"Invalid document request: {e}")
+        logger.error(f"Invalid document request: {e}")
         raise HTTPException(
             status_code=400,
             detail=str(e),
         )
 
     except Exception as e:
-        logger.exception(
-            f"Failed to upload document: {e}"
-        )
+        logger.error(f"Error while uploading document: {e}")
         raise HTTPException(
             status_code=500,
-            detail="Failed to process document.",
+            detail=str(e),
         )

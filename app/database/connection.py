@@ -47,15 +47,8 @@ def get_db_connection():
 
         conn = connection_pool.getconn()
 
-        if not conn:
-            raise ConnectionError("Unable to connect to the database.")
-
         cur = conn.cursor()
-
-        if not cur:
-            raise ConnectionError("Unable to create cursor for the database.")
         
-        logger.debug(f"connection pool : {conn}")
         return conn, cur
     
     except ConnectionError as e:
@@ -73,8 +66,6 @@ def release_db_connection(conn, cur=None):
 
         if conn:
             connection_pool.putconn(conn)
-
-        logger.debug(f"connection release : {conn}")
 
     except Exception as e:
         logger.error(f"Error releasing connection: {e}")

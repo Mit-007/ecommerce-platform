@@ -1,5 +1,5 @@
 from typing import List
-from server.database.connection import get_db_connection,release_db_connection
+from server.database.connection import get_db_connection, release_db_connection
 from server.core.logger import logger
 
 def search_documents_by_vector(
@@ -36,12 +36,6 @@ def search_documents_by_vector(
     try:
         conn, cur = get_db_connection()
         
-        if not conn or not cur:
-            raise Exception("Database connection failed")
-        
-        # Convert embedding list to PostgreSQL vector format
-        embedding_string = "[" + ",".join(str(value) for value in embedding) + "]"
-        
         # Execute vector similarity search using cosine distance operator (<=>)
         cur.execute(
             """
@@ -57,8 +51,8 @@ def search_documents_by_vector(
             LIMIT %s
             """,
             (
-                embedding_string,
-                embedding_string,
+                embedding,
+                embedding,
                 top_n,
             ),
         )

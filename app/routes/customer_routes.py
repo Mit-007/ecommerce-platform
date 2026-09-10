@@ -1,44 +1,107 @@
-from fastapi import APIRouter
-from uuid import UUID
-from app.database.repositories.customer_repositories import update_customer_password,delete_customer_by_id,get_customer_by_id
-from app.core.logger import logger
 from fastapi import APIRouter, HTTPException
+from uuid import UUID
+from app.model.auth_routes_schema import ChnagePassword
+from app.database.repositories.customer_repositories import (
+    update_customer_password,
+    delete_customer_by_id,
+    get_customer_by_id,
+)
+from app.core.logger import logger
 
-router = APIRouter(prefix="/customer", tags=["customer"])
+router = APIRouter(prefix="/customer",tags=["customer"])
 
 
 @router.get("/{customer_id}")
-def get_customer(customer_id):
+def get_customer(customer_id: UUID):
     try:
         customer_data = get_customer_by_id(customer_id)
+
+        if customer_data is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Customer with ID {customer_id} not found.",
+            )
+
         return customer_data
-    
+
+    except HTTPException:
+        raise
+
+    except ConnectionError as e:
+        logger.error(f"Database connection error: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail=str(e),
+        )
+
     except Exception as e:
-        logger.error(e)
-        return {
-            "message" : "not get user !!"
-        }
+        logger.error(f"Error while getting customer: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
+
 
 @router.put("/{customer_id}")
-def change_customer_password(customer_id,new_password):
+def change_customer_password(customer_id: UUID, request:ChnagePassword):
     try:
-        result = update_customer_password(customer_id,new_password)
-        return result 
+        result = update_customer_password(
+            customer_id,
+            request.new_password,
+        )
+
+        if result is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Customer with ID {customer_id} not found.",
+            )
+
+        return result
+
+    except HTTPException:
+        raise
+
+    except ConnectionError as e:
+        logger.error(f"Database connection error: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail=str(e),
+        )
+
     except Exception as e:
-        logger.error(e)
-        return {
-            "message" : "not update user !!"
-        }
-    
+        logger.error(f"Error while updating customer password: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
+
 
 @router.delete("/{customer_id}")
-def delete_customer(customer_id):
+def delete_customer(customer_id: UUID):
     try:
         result = delete_customer_by_id(customer_id)
 
+        if result is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Customer with ID {customer_id} not found.",
+            )
+
         return result
+
+    except HTTPException:
+        raise
+
+    except ConnectionError as e:
+        logger.error(f"Database connection error: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail=str(e),
+        )
+
     except Exception as e:
-        logger.error(e)
-        return {
-            "message" : "not update user !!"
-        }
+        logger.error(f"Error while deleting customer: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )

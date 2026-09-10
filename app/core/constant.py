@@ -3,7 +3,7 @@ company = {
     "company_email": "support@buyzaar.com",
 }
 
-# set A  output_dimensionality
+# set A  output_dimensionality for embedding
 OUTPUT_DIMENSIONALITY = 3072
 
 
@@ -11,7 +11,10 @@ OUTPUT_DIMENSIONALITY = 3072
 EMBEDDING_MODEL = "gemini-embedding-2"
 
 
-# set chunking veriables
-# set always CHUCK_SIZE > CHUNK_OVERLAP
-CHUNK_SIZE=1000
-CHUNK_OVERLAP=200
+# set limit for maximum tool_call in single graph run
+MAXIMUM_TOOL_CALLS = 10
+
+# set chunking variables
+# set always CHUNK_SIZE > CHUNK_OVERLAP
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 200

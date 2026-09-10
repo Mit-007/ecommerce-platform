@@ -4,18 +4,17 @@ from server.models.tool_input_schema import CreateSupportTicket,GetSupportTicket
 from server.models.tool_output_schema import ToolResponse
 from server.database.repositories.support_ticket_tool_repositories import create_support_ticket_by_order_id,get_support_ticket_by_id
 
-def register_document_tools(mcp: FastMCP):
+def register_support_ticket_tools(mcp: FastMCP):
 
     @mcp.tool()
     def create_support_ticket(request: CreateSupportTicket) -> ToolResponse:
         """
-        Retrieve order details by order ID
+        Create a new support ticket for an order. Captures customer issues 
+        and associates them with the order and conversation for tracking.
         """
         logger.info("Tool_call : create_support_ticket")
-        try :   
+        try:   
             result = create_support_ticket_by_order_id(request.order_id,request.summary,request.conversation_id)
-
-            logger.info(result)
 
             return ToolResponse(
                 success = True,
@@ -34,13 +33,11 @@ def register_document_tools(mcp: FastMCP):
     @mcp.tool()
     def get_support_ticket(request: GetSupportTicket) -> ToolResponse:
         """
-        Retrieve order details by order ID
+        Retrieve details of a specific support ticket by ticket ID.
         """
         logger.info("Tool_call : get_support_ticket")
-        try :   
+        try:   
             result = get_support_ticket_by_id(request.support_ticket_id)
-
-            logger.info(result)
             
             return ToolResponse(
                 success = True,
@@ -49,7 +46,7 @@ def register_document_tools(mcp: FastMCP):
             )
     
         except Exception as e:
-            logger.exception(e)
+            logger.exception(f"Unexpected error in get_support_ticket:{e}")
             return ToolResponse(
                 success = False,
                 data = None ,

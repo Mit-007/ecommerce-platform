@@ -2,7 +2,7 @@ from langgraph.graph import StateGraph, START ,END
 from app.agent.states import AgentState
 from app.agent import nodes as n
 
-# bulid Graph :
+# Build the agent graph
 builder = StateGraph(AgentState)
 builder.add_node("call_llm",n.call_llm)
 builder.add_node("tool_node",n.tool_node)

@@ -13,8 +13,8 @@ DB_HOST = os.getenv("HOST")
 if not DB_HOST:
     raise ValueError(error_msg("HOST"))
 
-DB_PORT = os.getenv("PORT")
-if not DB_PORT:
+DB_PORT = int(os.getenv("PORT", "5432"))
+if not DB_PORT or DB_PORT <= 0:
     raise ValueError(error_msg("PORT"))
 
 DB_DATABASE = os.getenv("POSTGRES_DB")
@@ -29,10 +29,10 @@ DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 if not DB_PASSWORD:
     raise ValueError(error_msg("POSTGRES_PASSWORD"))
 
-MIN_CONNECTION_POOLING = int(os.getenv("MIN_CONNECTION_POOLING", 1))
-if not MIN_CONNECTION_POOLING:
-    raise ValueError(error_msg("MIN_CONNECTION_POOLING"))
+MIN_CONNECTION_POOLING = int(os.getenv("MIN_CONNECTION_POOLING", "1"))
+if MIN_CONNECTION_POOLING <= 0:
+    raise ValueError("MIN_CONNECTION_POOLING must be > 0")
 
-MAX_CONNECTION_POOLING = int(os.getenv("MAX_CONNECTION_POOLING", 10))
-if not MAX_CONNECTION_POOLING:
-    raise ValueError(error_msg("MAX_CONNECTION_POOLING"))
+MAX_CONNECTION_POOLING = int(os.getenv("MAX_CONNECTION_POOLING", "10"))
+if MAX_CONNECTION_POOLING <= MIN_CONNECTION_POOLING:
+    raise ValueError("MAX_CONNECTION_POOLING must be > MIN_CONNECTION_POOLING")

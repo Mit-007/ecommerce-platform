@@ -13,7 +13,6 @@ class OrderStatus(str, Enum):
     CANCELLED = "cancelled" 
     RETURNED = "returned"
 
-
 class OrderItem(BaseModel):
     name: str = Field(...,min_length=1,max_length=255,)
     quantity: int = Field(...,gt=0,)
@@ -25,15 +24,7 @@ class CreateOrder(BaseModel):
     estimated_delivery_date: date | None = None
     returnable: bool = False
     product_list: list[OrderItem] = Field(...,min_length=1,)
+    
+class OrderStatusUpdate(BaseModel):
+    new_status: OrderStatus
 
-
-# --- all services regarding order_id
-# get/{order_id}
-# put/{order_id}
-# delete/{order_id}
-# get/{order_id}/items
-# get/{order_id}/tracking
-
-
-class OrderRequest(BaseModel):
-    order_id : UUID

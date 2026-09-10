@@ -1,4 +1,6 @@
 from dotenv import load_dotenv
+from pathlib import Path
+
 import os
 load_dotenv()
 
@@ -8,6 +10,13 @@ load_dotenv()
 def error_msg(missing_variable):
     return f"Missing required environment variable: {missing_variable}"
 
+
+# -------------
+# promtp file path
+# -------------
+PROMPT_FILE_PATH = Path(os.getenv("PROMPT_FILE_PATH"))
+if not PROMPT_FILE_PATH:
+    raise ValueError(error_msg("PROMPT_FILE_PATH"))
 
 
 # -------------
@@ -21,9 +30,9 @@ LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME")
 if not LLM_MODEL_NAME:
     raise ValueError(error_msg("LLM_MODEL_NAME"))
 
-TEMPERATURE = os.getenv("TEMPERATURE","0")
-if not TEMPERATURE:
-    raise ValueError(error_msg("TEMPERATURE"))
+TEMPERATURE = float(os.getenv("TEMPERATURE", "0.0"))
+if not (0 <= TEMPERATURE <= 2.0):
+    raise ValueError("TEMPERATURE must be between 0 and 2.0")
 
 
 
@@ -34,8 +43,8 @@ DB_HOST = os.getenv("HOST")
 if not DB_HOST:
     raise ValueError(error_msg("HOST"))
 
-DB_PORT = os.getenv("PORT")
-if not DB_PORT:
+DB_PORT = int(os.getenv("PORT", "5432"))
+if not DB_PORT or DB_PORT <= 0:
     raise ValueError(error_msg("PORT"))
 
 DB_DATABASE = os.getenv("POSTGRES_DB")
@@ -50,14 +59,13 @@ DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 if not DB_PASSWORD:
     raise ValueError(error_msg("POSTGRES_PASSWORD"))
 
-MIN_CONNECTION_POOLING = int(os.getenv("MIN_CONNECTION_POOLING", 1))
-if not MIN_CONNECTION_POOLING:
-    raise ValueError(error_msg("MIN_CONNECTION_POOLING"))
+MIN_CONNECTION_POOLING = int(os.getenv("MIN_CONNECTION_POOLING", "1"))
+if MIN_CONNECTION_POOLING <= 0:
+    raise ValueError("MIN_CONNECTION_POOLING must be > 0")
 
-MAX_CONNECTION_POOLING = int(os.getenv("MAX_CONNECTION_POOLING", 10))
-if not MAX_CONNECTION_POOLING:
-    raise ValueError(error_msg("MAX_CONNECTION_POOLING"))
-
+MAX_CONNECTION_POOLING = int(os.getenv("MAX_CONNECTION_POOLING", "10"))
+if MAX_CONNECTION_POOLING <= MIN_CONNECTION_POOLING:
+    raise ValueError("MAX_CONNECTION_POOLING must be > MIN_CONNECTION_POOLING")
 
 
 # ------------
@@ -72,10 +80,12 @@ ALGORITHM = os.getenv("ALGORITHM")
 if not ALGORITHM:
     raise ValueError(error_msg("ALGORITHM"))
 
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-if not ACCESS_TOKEN_EXPIRE_MINUTES:
-    raise ValueError(error_msg("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
-REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS"))
-if not REFRESH_TOKEN_EXPIRE_DAYS:
-    raise ValueError(error_msg("REFRESH_TOKEN_EXPIRE_DAYS"))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+if ACCESS_TOKEN_EXPIRE_MINUTES <= 0:
+    raise ValueError("ACCESS_TOKEN_EXPIRE_MINUTES must be > 0")
+
+
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
+if REFRESH_TOKEN_EXPIRE_DAYS <= 0:
+    raise ValueError("REFRESH_TOKEN_EXPIRE_DAYS must be > 0")

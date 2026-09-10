@@ -2,9 +2,9 @@ from typing import Literal
 from app.agent.states import AgentState
 from app.core.logger import logger
 from app.services.llm_service import get_llm
-from app.services.prompt_templete import get_chat_agent_prompt
+from app.services.prompt_template import get_chat_agent_prompt
 from app.client.client import get_mcp_tools_dict
-
+from app.core.constant import MAXIMUM_TOOL_CALLS
 
 # =========================
 # call_llm
@@ -18,9 +18,9 @@ async def call_llm(state: AgentState) -> AgentState:
         if not question or not question.strip():
             raise ValueError("Invalid input: question is empty.")
 
-        previous_chat = state.get("previous_chat",[],)
+        previous_chat = state.get("previous_chat",[])
 
-        tool_call_log = state.get("tool_call_log",[],)
+        tool_call_log = state.get("tool_call_log",[])
 
         # Create prompt
         llm_prompt = get_chat_agent_prompt(
@@ -43,7 +43,7 @@ async def call_llm(state: AgentState) -> AgentState:
         if result is None:
             raise RuntimeError("LLM returned an empty response.")
 
-        tool_calls = getattr(result,"tool_calls",[],)
+        tool_calls = getattr(result,"tool_calls",[])
 
         logger.info(
             f"LLM response received. "
@@ -76,9 +76,9 @@ def route_tool_node(
     """
     logger.info("Node:-route_tool_node")
     try:
-        tool_calls = state.get("tool_calls",[],)
+        tool_calls = state.get("tool_calls",[])
 
-        if tool_calls:
+        if tool_calls and (len(state.get("tool_call_log"))+len(tool_calls)) <= MAXIMUM_TOOL_CALLS:
             logger.info(
                 f"Routing to tool_node. "
                 f"Tool calls={len(tool_calls)}"

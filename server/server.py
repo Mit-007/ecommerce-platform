@@ -1,9 +1,6 @@
 from contextlib import asynccontextmanager
 from fastmcp import FastMCP
-from server.database.connection import (
-    init_db_pool,
-    close_db_pool,
-)
+from server.database.connection import (init_db_pool,close_db_pool)
 from server.tools import (
     order_tool as OT,
     search_tool as ST,
@@ -38,9 +35,9 @@ mcp = FastMCP(
 
 
 # Register MCP tools
-OT.register_document_tools(mcp)
-ST.register_search_tools(mcp)
-TT.register_document_tools(mcp)
+OT.register_order_tools(mcp)  # order tools 
+ST.register_search_tools(mcp) # search tools
+TT.register_support_ticket_tools(mcp) # support ticket tools
 
 
 if __name__ == "__main__":

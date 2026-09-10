@@ -1,7 +1,7 @@
 import asyncio
 from app.agent.graph import agent
 from app.services.llm_service import initialize_llm
-from app.services.prompt_templete import initialize_prompt_templates
+from app.services.prompt_template import initialize_prompt_templates
 
 _previous_chat = []
 
