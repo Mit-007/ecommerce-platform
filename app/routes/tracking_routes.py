@@ -40,7 +40,7 @@ def traking_order(order_id: UUID):
         return tracking_event_list
     
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "not get tracking events !!"
         } 

@@ -14,7 +14,7 @@ def get_customer(customer_id):
         return customer_data
     
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "not get user !!"
         }
@@ -25,7 +25,7 @@ def change_customer_password(customer_id,new_password):
         result = update_customer_password(customer_id,new_password)
         return result 
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "not update user !!"
         }
@@ -38,7 +38,7 @@ def delete_customer(customer_id):
 
         return result
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "not update user !!"
         }

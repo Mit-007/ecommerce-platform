@@ -111,7 +111,3 @@ def refresh_access_token(refresh_token: str):
 
     except JWTError:
         return None
-
-
-# print(verify_access_token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlYTVmNTUzMC00NmQ2LTRmYTctODMzYi1hY2NkZDMxMTA3YmMiLCJleHAiOjE3ODg1MjkyNDUsInR5cGUiOiJhY2Nlc3MifQ.ZEm75aBL29xeyLQFTdp0BeSIuU0mXelZ_D-DPCosEPM"))
-# print(refresh_access_token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlYTVmNTUzMC00NmQ2LTRmYTctODMzYi1hY2NkZDMxMTA3YmMiLCJleHAiOjE3ODkxMjg4MzcsInR5cGUiOiJyZWZyZXNoIn0.xeL-SRu4-wNcob5LHVx9BH-W8vZnwr28R4ShtSXgq1M"))

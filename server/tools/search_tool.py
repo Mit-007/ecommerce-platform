@@ -3,7 +3,7 @@ from server.core.logger import logger
 from server.services.embedding_service import generate_embedding
 from server.models.tool_output_schema import ToolResponse
 from server.database.repositories.search_tool_repositories import search_documents_by_vector
-
+from server.core.constant import MAXIMUM_RETRIEVAL_CHUNK,DEFAULT_TOP_N
 
 def register_search_tools(mcp: FastMCP) -> None:
     """Register vector search tools with MCP server"""
@@ -15,7 +15,7 @@ def register_search_tools(mcp: FastMCP) -> None:
     ) -> ToolResponse:
         """
         Search documents using vector similarity with pgvector. Converts the search query
-        into a 3072-dimensional embedding and retrieves the most semantically relevant 
+        into a  embedding and retrieves the most semantically relevant 
         document chunks from the document table ranked by cosine similarity score.
         
         This tool enables semantic search capabilities allowing you to find documents 
@@ -62,7 +62,7 @@ def register_search_tools(mcp: FastMCP) -> None:
                     error="top_n must be an integer"
                 )
             
-            if top_n <= 0 or top_n > 20:
+            if top_n <= 0 or top_n > MAXIMUM_RETRIEVAL_CHUNK:
                 logger.warning(f"top_n out of range: {top_n}")
                 top_n = min(max(top_n, 1), 20)
                 logger.info(f"Adjusted top_n to {top_n}")

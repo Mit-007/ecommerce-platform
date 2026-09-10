@@ -4,7 +4,7 @@ from server.core.logger import logger
 
 def search_documents_by_vector(
     embedding: List[float],
-    top_n: int = 5,
+    top_n,
 ) -> List[dict]:
     """
     Search documents using pgvector cosine similarity.
@@ -23,20 +23,12 @@ def search_documents_by_vector(
     Raises:
         ValueError: If embedding is invalid or top_n is out of range
         Exception: If database operation fails
-    """
-    logger.info(f"Searching documents with top_n={top_n}")
-    
+    """    
     if not embedding or not isinstance(embedding, (list, tuple)):
-        logger.error("Invalid embedding provided")
         raise ValueError("Embedding must be a non-empty list or tuple of floats")
     
     if len(embedding) != 3072:
-        logger.error(f"Invalid embedding dimension: expected 3072, got {len(embedding)}")
         raise ValueError("Embedding must have exactly 3072 dimensions")
-    
-    if top_n <= 0 or top_n > 20:
-        logger.error(f"Invalid top_n value: {top_n}")
-        raise ValueError("top_n must be between 1 and 20")
     
     conn = None
     cur = None
@@ -45,7 +37,6 @@ def search_documents_by_vector(
         conn, cur = get_db_connection()
         
         if not conn or not cur:
-            logger.error("Failed to establish database connection")
             raise Exception("Database connection failed")
         
         # Convert embedding list to PostgreSQL vector format
@@ -81,21 +72,18 @@ def search_documents_by_vector(
         results = []
         for row in rows:
             results.append(row[1] if row[1] else "")
+            logger.info(30*"-")
+            logger.info(row[2])
         
         logger.info(f"Successfully retrieved {len(results)} documents from vector search")
         return results
         
     except ValueError as e:
-        logger.warning(f"Validation error in search_documents_by_vector: {str(e)}")
         raise
         
     except Exception as e:
-        logger.error(f"Database error in search_documents_by_vector: {str(e)}", exc_info=True)
         raise Exception(f"Vector search operation failed: {str(e)}")
         
     finally:
-        if conn and cur:
-            try:
-                release_db_connection(conn, cur)
-            except Exception as e:
-                logger.warning(f"Error releasing database connection: {str(e)}")
+        if conn:
+            release_db_connection(conn, cur)

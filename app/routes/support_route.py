@@ -37,6 +37,7 @@ async def call_ai_agent(request: AgentRequest):
             "question": user_question,
             "tool_call_log": [],
             "previous_chat": past_converstion,
+            "conversation_id" : conversation_id
         }
 
         # Async LangGraph execution

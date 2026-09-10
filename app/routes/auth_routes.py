@@ -3,6 +3,7 @@ from app.database.repositories.customer_repositories import create_new_customer,
 from app.utils.jwt import create_access_token,create_refresh_token,refresh_access_token
 from app.services.hashing import verify_password 
 from app.model.auth_routes_schema import RefreshTokenRequest
+from app.core.logger import logger
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -13,7 +14,7 @@ def register_new_custmer(name,email,password):
         new_customer = create_new_customer(name,email,password)
         return new_customer
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "not crate user !!"
         }
@@ -36,7 +37,7 @@ def login_user(email,password):
             }
 
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "error !!"
         }

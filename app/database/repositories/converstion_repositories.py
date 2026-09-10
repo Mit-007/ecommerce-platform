@@ -1,9 +1,10 @@
+import json
 from uuid import UUID
+from app.core.logger import logger
 from app.database.connection import (
     get_db_connection,
     release_db_connection,
 )
-from app.core.logger import logger
 
 
 def get_conversation_by_id(conversation_id: UUID) -> dict | None:
@@ -11,7 +12,7 @@ def get_conversation_by_id(conversation_id: UUID) -> dict | None:
     Retrieve a conversation by conversation_id.
 
     Returns the conversation details including
-    chat messages, or None if the conversation
+    chat messages, or return None if the conversation
     does not exist.
     """
 
@@ -41,46 +42,20 @@ def get_conversation_by_id(conversation_id: UUID) -> dict | None:
         row = cur.fetchone()
 
         if not row:
-            logger.warning(
-                f"Conversation not found: {conversation_id}"
-            )
+            logger.warning(f"Conversation not found: {conversation_id}")
             return None
 
-        # conversation = {
-        #     "conversation_id": str(row[0]),
-        #     "customer_id": str(row[1]),
-        #     "title": row[2],
-        #     "messages": row[3],
-        #     "created_at": row[4].isoformat(),
-        #     "updated_at": row[5].isoformat(),
-        # }
-
-        logger.info(
-            f"Conversation retrieved successfully: {conversation_id}"
-        )
+        logger.info(f"Conversation retrieved successfully: {conversation_id}")
 
         return row
 
     except Exception as e:
-        logger.exception(
-            f"Failed to retrieve conversation "
-            f"{conversation_id}: {e}"
-        )
+        logger.exception(f"Failed to retrieve conversation for {conversation_id}: {e}")
         raise
 
     finally:
         if conn:
             release_db_connection(conn, cur)
-
-
-import json
-from uuid import UUID
-
-from app.database.connection import (
-    get_db_connection,
-    release_db_connection,
-)
-from app.core.logger import logger
 
 
 def append_conversation_messages(
@@ -115,31 +90,21 @@ def append_conversation_messages(
 
         if cur.rowcount == 0:
             conn.rollback()
-
-            logger.warning(
-                f"Conversation not found: {conversation_id}"
-            )
-
+            logger.warning(f"Conversation not found: {conversation_id}")
             return False
 
         conn.commit()
 
-        logger.info(
-            f"Successfully appended {len(new_messages)} messages "
-            f"to conversation: {conversation_id}"
-        )
+        logger.info(f"Successfully appended {len(new_messages)} messages to conversation: {conversation_id}")
 
         return True
 
     except Exception as e:
         if conn:
             conn.rollback()
-
+            
         logger.exception(
-            f"Failed to append messages to conversation "
-            f"{conversation_id}: {e}"
-        )
-
+            f"Failed to append messages to conversation {conversation_id}: {e}")
         raise
 
     finally:

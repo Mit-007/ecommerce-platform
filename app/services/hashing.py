@@ -1,4 +1,5 @@
 from argon2 import PasswordHasher
+from app.core.logger import logger
 
 hasher = PasswordHasher()
 
@@ -10,5 +11,5 @@ def verify_password(user_password,original_password):
         hasher.verify(original_password,user_password)
         return True
     except:
-        print('Wrong password :')
+        logger.info('Wrong password :')
         return False

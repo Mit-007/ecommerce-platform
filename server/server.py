@@ -5,7 +5,6 @@ from server.database.connection import (
     close_db_pool,
 )
 from server.tools import (
-    document_tool as DT,
     order_tool as OT,
     search_tool as ST,
     support_ticket_tool as TT
@@ -39,7 +38,6 @@ mcp = FastMCP(
 
 
 # Register MCP tools
-DT.register_document_tools(mcp)
 OT.register_document_tools(mcp)
 ST.register_search_tools(mcp)
 TT.register_document_tools(mcp)

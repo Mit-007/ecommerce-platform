@@ -1,12 +1,10 @@
 from google import genai
 from google.genai import types
 from server.core.constant import EMBEDDING_MODEL,OUTPUT_DIMENSIONALITY
-
 from server.core.config import GOOGLE_API_KEY
 
 
 client = genai.Client(api_key=GOOGLE_API_KEY)
-
 
 def generate_embedding(text: str) -> list[float]:
     try:

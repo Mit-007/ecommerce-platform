@@ -22,14 +22,9 @@ async def initialize_mcp():
 
         _mcp_tools = await _mcp_client.get_tools()
 
-        logger.info(
-            f"Successfully connected to MCP server. "
-            f"Loaded {len(_mcp_tools)} tools"
-        )
-        logger.info("------------tool_list-------------------")
+        logger.info(f"Successfully connected to MCP server and Loaded {len(_mcp_tools)} tools ")
+
         for tool in _mcp_tools:
-            logger.info(tool.name)
-            # print(tool)
             _mcp_tools_dict[tool.name] = tool
 
         return _mcp_tools
@@ -37,19 +32,8 @@ async def initialize_mcp():
     except Exception as e:
         logger.error(f"Failed to connect to MCP server: {e}")
 
-        raise ConnectionError(
-            f"Failed to connect to MCP server: {e}"
-        ) from e
-
-
-def get_mcp_tools():
-    if _mcp_tools is None:
-        raise RuntimeError(
-            "MCP tools are not initialized. "
-            "Call initialize_mcp() during application startup."
-        )
-
-    return _mcp_tools
+        raise ConnectionError(f"Failed to connect to MCP server: {e}") from e
+    
 
 def get_mcp_tools_dict():
     if _mcp_tools_dict == {}:

@@ -24,7 +24,7 @@ def create_order(data : CreateOrder):
         }
     
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "not craete new order !!"
         }
@@ -37,7 +37,7 @@ def get_order(order_id):
         return order_data
     
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "not get order !!"
         }
@@ -48,7 +48,7 @@ def update_order_status(order_id,new_status):
         result = update_order_status_by_id(order_id,new_status)
         return result 
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "not update order !!"
         }
@@ -61,7 +61,7 @@ def delete_order(order_id:UUID):
 
         return result
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "not delete order !!"
         }
@@ -74,7 +74,7 @@ def list_order_products(order_id: UUID):
         return product_list
     
     except Exception as e:
-        print(e)
+        logger.error(e)
         return {
             "message" : "not list products !!"
         }   

@@ -34,7 +34,7 @@ def close_db_pool():
             connection_pool.closeall()
             connection_pool = None
 
-            logger.debug("Database connection pool closed successfully.")
+            logger.info("Database connection pool closed successfully.")
 
     except Exception as e:
         logger.exception(f"Failed to close database connection pool: {e}")
