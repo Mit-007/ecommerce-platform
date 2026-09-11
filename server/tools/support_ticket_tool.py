@@ -52,4 +52,3 @@ def register_support_ticket_tools(mcp: FastMCP):
                 data = None ,
                 error = str(e)   
             )
-

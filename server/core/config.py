@@ -15,7 +15,7 @@ if not DB_HOST:
 
 DB_PORT = int(os.getenv("PORT", "5432"))
 if not DB_PORT or DB_PORT <= 0:
-    raise ValueError(error_msg("PORT"))
+    raise ValueError("Database port must be a positive integer.")
 
 DB_DATABASE = os.getenv("POSTGRES_DB")
 if not DB_DATABASE:
@@ -36,3 +36,12 @@ if MIN_CONNECTION_POOLING <= 0:
 MAX_CONNECTION_POOLING = int(os.getenv("MAX_CONNECTION_POOLING", "10"))
 if MAX_CONNECTION_POOLING <= MIN_CONNECTION_POOLING:
     raise ValueError("MAX_CONNECTION_POOLING must be > MIN_CONNECTION_POOLING")
+
+
+SERVER_HOST = os.getenv("SERVER_HOST")
+if not SERVER_HOST:
+    raise ValueError(error_msg("SERVER_HOST"))
+
+SERVER_PORT = int(os.getenv("SERVER_PORT", "3000"))
+if not SERVER_PORT or SERVER_PORT <= 0:
+    raise ValueError("MCP port must be a positive integer.")

@@ -46,7 +46,7 @@ if not DB_HOST:
 
 DB_PORT = int(os.getenv("PORT", "5432"))
 if not DB_PORT or DB_PORT <= 0:
-    raise ValueError(error_msg("PORT"))
+    raise ValueError("Database port must be a positive integer.")
 
 DB_DATABASE = os.getenv("POSTGRES_DB")
 if not DB_DATABASE:

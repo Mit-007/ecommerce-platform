@@ -1,6 +1,5 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from app.database.connection import init_db_pool, close_db_pool
 from app.routes import (
     conversation_routes,
@@ -55,15 +54,6 @@ async def lifespan(app: FastAPI):
         logger.info("Application shutdown completed.")
 
 app = FastAPI(lifespan=lifespan)
-
-# Enable CORS for frontend connection
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Routes
 app.include_router(support_route.router)

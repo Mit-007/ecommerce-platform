@@ -7,6 +7,7 @@ from server.tools import (
     support_ticket_tool as TT
 )
 from server.core.logger import logger
+from server.core.config import SERVER_HOST,SERVER_PORT
 
 @asynccontextmanager
 async def lifespan(server: FastMCP):
@@ -45,8 +46,8 @@ if __name__ == "__main__":
     try:
         mcp.run(
             transport="http",
-            host="0.0.0.0",
-            port=3001,
+            host=SERVER_HOST,
+            port=SERVER_PORT,
         )
 
     except Exception:
