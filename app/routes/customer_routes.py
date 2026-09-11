@@ -13,6 +13,9 @@ router = APIRouter(prefix="/customer",tags=["customer"])
 
 @router.get("/{customer_id}")
 def get_customer(customer_id: UUID):
+    """
+    fetch customer details using id.
+    """
     try:
         customer_data = get_customer_by_id(customer_id)
 
@@ -44,6 +47,9 @@ def get_customer(customer_id: UUID):
 
 @router.put("/{customer_id}")
 def change_customer_password(customer_id: UUID, request:ChangePassword):
+    """
+    change a customer password.
+    """
     try:
         result = update_customer_password(
             customer_id,
@@ -78,6 +84,9 @@ def change_customer_password(customer_id: UUID, request:ChangePassword):
 
 @router.delete("/{customer_id}")
 def delete_customer(customer_id: UUID):
+    """
+    delete a customer profile.
+    """
     try:
         result = delete_customer_by_id(customer_id)
 

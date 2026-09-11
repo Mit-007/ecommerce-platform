@@ -9,6 +9,9 @@ router = APIRouter(prefix="/orders",tags=["tracking order"])
 
 @router.post("/{order_id}/tracking")
 def create_order_tracking(order_id: UUID,data: CreateTrackingEvent):
+    """
+    create new tracking event for order.
+    """
     try:
         tracking_event = create_tracking_event(
             order_id=order_id,
@@ -44,6 +47,9 @@ def create_order_tracking(order_id: UUID,data: CreateTrackingEvent):
 
 @router.get("/{order_id}/tracking")
 def tracking_order(order_id: UUID):
+    """
+    list all track events for order.
+    """
     try:
         tracking_event_list = tracking_order_by_id(order_id)
 

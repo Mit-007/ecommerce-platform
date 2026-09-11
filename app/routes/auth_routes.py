@@ -19,6 +19,9 @@ router = APIRouter(prefix="/auth",tags=["auth"],)
 
 @router.post("/register")
 def register_new_customer(request: RegisterCustomerRequest):
+    """
+    register new customer.
+    """
     try:
         new_customer = create_new_customer(
             request.name,
@@ -48,6 +51,9 @@ def register_new_customer(request: RegisterCustomerRequest):
 
 @router.post("/login")
 def login_user(request: LoginCustomerRequest):
+    """
+    login a customer with email and password.
+    """
     try:
         customer_data = fetch_password_by_email(
             request.email
@@ -98,6 +104,9 @@ def login_user(request: LoginCustomerRequest):
 
 @router.post("/refresh")
 def refresh_token(request: RefreshTokenRequest):
+    """
+    generate a new access token using refresh token.
+    """
     try:
         new_access_token = refresh_access_token(
             request.refresh_token

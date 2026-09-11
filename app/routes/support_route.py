@@ -13,6 +13,9 @@ router = APIRouter(prefix="/agent",tags=["Chat Bot Routes"])
 
 @router.post("/call")
 async def call_ai_agent(request: AgentRequest):
+    """
+    invoke agent and return llm response.
+    """
     try:
         user_question = request.message.strip()
         conversation_id = request.conversation_id

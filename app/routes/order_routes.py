@@ -22,6 +22,9 @@ router = APIRouter(prefix="/orders",tags=["orders"],)
 
 @router.post("/")
 def create_order(data: CreateOrder):
+    """
+    create new order.
+    """
     try:
         order_data = create_new_order(
             data.customer_id,
@@ -69,6 +72,9 @@ def create_order(data: CreateOrder):
 
 @router.get("/{order_id}")
 def get_order(order_id: UUID):
+    """
+    fetch order from db using order id.
+    """
     try:
         order_data = get_order_by_id(order_id)
 
@@ -103,6 +109,9 @@ def update_order_status(
     order_id: UUID,
     request: OrderStatusUpdate,
 ):
+    """
+    order status change using a order id.
+    """
     try:
         result = update_order_status_by_id(
             order_id,
@@ -137,6 +146,9 @@ def update_order_status(
 
 @router.delete("/{order_id}")
 def delete_order(order_id: UUID):
+    """
+    delete a order from databse.
+    """
     try:
         result = delete_order_by_id(order_id)
 
@@ -168,6 +180,9 @@ def delete_order(order_id: UUID):
 
 @router.get("/{order_id}/items")
 def list_order_products(order_id: UUID):
+    """
+    list all procucts of order.
+    """
     try:
         product_list = list_products_by_id(order_id)
 

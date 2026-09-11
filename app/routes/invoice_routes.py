@@ -18,6 +18,9 @@ router = APIRouter(prefix="/invoices",tags=["invoices"])
 
 @router.get("/{invoice_id}")
 def get_invoice(invoice_id: UUID):
+    """
+    fetch invoice using id.
+    """
     try:
         invoice_data = get_invoice_by_id(invoice_id)
 
@@ -49,6 +52,9 @@ def get_invoice(invoice_id: UUID):
 
 @router.post("/")
 def create_invoice(request: CreateInvoice):
+    """
+    create new invoice in database.
+    """
     try:
         invoice_data = create_new_invoice(
             customer_id=request.customer_id,
@@ -84,6 +90,9 @@ def create_invoice(request: CreateInvoice):
 
 @router.delete("/{invoice_id}")
 def delete_invoice(invoice_id: UUID):
+    """
+    delete a invoice from database.
+    """
     try:
         result = delete_invoice_by_id(invoice_id)
 
@@ -115,6 +124,9 @@ def delete_invoice(invoice_id: UUID):
 
 @router.get("/{invoice_id}/orders")
 def list_invoice_orders(invoice_id: UUID):
+    """
+    list all order for invoice id.
+    """
     try:
         orders = get_orders_by_invoice_id(invoice_id)
 
@@ -149,6 +161,9 @@ def update_invoice_status(
     invoice_id: UUID,
     request: UpdateInvoiceStatus,
 ):
+    """
+    change a invoice status.
+    """
     try:
         result = update_invoice_status_by_id(
             invoice_id=invoice_id,
@@ -183,6 +198,9 @@ def update_invoice_status(
 
 @router.get("/customer/{customer_id}")
 def list_customer_invoices(customer_id: UUID):
+    """
+    list all customer invoices.
+    """
     try:
         invoices = get_customer_invoices(customer_id)
 
