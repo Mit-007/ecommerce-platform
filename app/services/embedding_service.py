@@ -2,6 +2,7 @@ from google import genai
 from google.genai import types
 from app.core.constant import EMBEDDING_MODEL,OUTPUT_DIMENSIONALITY
 from app.core.config import GOOGLE_API_KEY
+from app.services.extract_response import extract_embedding_vector
 
 try:
     client = genai.Client(api_key=GOOGLE_API_KEY)
@@ -18,7 +19,7 @@ def generate_embedding(text: str) -> list[float]:
             ),
         )
 
-        return response.embeddings[0].values
+        return extract_embedding_vector(response)
 
     except Exception as e:
         raise RuntimeError(f"Failed to generate embedding: {e}")

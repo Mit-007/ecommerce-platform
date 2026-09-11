@@ -5,6 +5,9 @@ from uuid import UUID
 # Agent state Schema
 # =========
 class AgentState(TypedDict):
+    """
+    Agent state schema.
+    """
     question : str
     final_answer : Any
     tool_calls : list

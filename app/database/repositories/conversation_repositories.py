@@ -185,6 +185,9 @@ def create_new_conversation(
     customer_id: UUID,
     title: str | None = None,
 ) -> tuple:
+    """
+    Add new conversation in database.
+    """
 
     conn = None
     cur = None

@@ -7,6 +7,7 @@ from app.database.repositories.conversation_repositories import (
 from app.agent.graph import agent
 from app.core.logger import logger
 from app.model.support_agent_schema import AgentRequest
+from app.services.extract_response import extract_response_text
 
 router = APIRouter(prefix="/agent",tags=["Chat Bot Routes"])
 
@@ -58,10 +59,7 @@ async def call_ai_agent(request: AgentRequest):
 
         response = await agent.ainvoke(input_state)
 
-        final_answer = response["final_answer"].content
-
-        if isinstance(final_answer, list):
-            final_answer = final_answer[0].get("text", "")
+        final_answer = extract_response_text(response["final_answer"])
 
         new_messages_list = [
             {

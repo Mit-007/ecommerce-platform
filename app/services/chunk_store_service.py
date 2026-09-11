@@ -14,6 +14,7 @@ def chunk_and_store_document(
     and store all chunks in PostgreSQL.
     """
 
+    # 1. Input validation
     if not text or not text.strip():
         raise ValueError("Text cannot be empty.")
 
@@ -23,58 +24,66 @@ def chunk_and_store_document(
     if not document_type or not document_type.strip():
         raise ValueError("Document type cannot be empty.")
 
-    # --------------------------------
-    # 1. Create chunks
-    # --------------------------------
+    try:
+        # 2. Create chunks
+        chunks = create_chunks(text=text)
 
-    chunks = create_chunks(text=text)
+        if not chunks:
+            raise ValueError("No chunks were created.")
 
-    if not chunks:
-        raise ValueError("No chunks were created.")
+        total_chunks = len(chunks)
 
-    total_chunks = len(chunks)
 
-    # --------------------------------
-    # 2. Generate embeddings
-    # --------------------------------
+        # 3. Generate embeddings
+        documents = []
 
-    documents = []
+        for chunk_index, chunk in enumerate(chunks):
 
-    for chunk_index, chunk in enumerate(chunks):
+            embedding = generate_embedding(chunk)
 
-        embedding = generate_embedding(chunk)
-
-        metadata = {
-            "file_name": file_name,
-            "type": document_type,
-            "chunk_index": chunk_index,
-            "total_chunks": total_chunks,
-        }
-
-        documents.append(
-            {
-                "text": chunk,
-                "embedding": embedding,
-                "metadata": metadata,
+            metadata = {
+                "file_name": file_name,
+                "type": document_type,
+                "chunk_index": chunk_index,
+                "total_chunks": total_chunks,
             }
+
+            documents.append(
+                {
+                    "text": chunk,
+                    "embedding": embedding,
+                    "metadata": metadata,
+                }
+            )
+
+        # --------------------------------
+        # 4. Store in database
+        # --------------------------------
+
+        inserted_count = store_documents_bulk(
+            documents_list=documents
         )
 
-    # --------------------------------
-    # 3. Bulk store in database
-    # --------------------------------
+        logger.debug(
+            f"Successfully processed document "
+            f"'{file_name}' with {inserted_count} chunks."
+        )
 
-    inserted_count = store_documents_bulk(
-        documents_list=documents
-    )
+        return {
+            "success": True,
+            "file_name": file_name,
+            "type": document_type,
+            "number_of_chunks": inserted_count,
+        }
 
-    logger.debug(
-        f"Successfully processed document "
-        f"'{file_name}' with {inserted_count} chunks."
-    )
+    except ValueError:
+        raise
 
-    return {
-        "success": True,
-        "file_name": file_name,
-        "type": document_type,
-        "number_of_chunks": inserted_count,
-    }
+    except Exception as e:
+        logger.exception(
+            f"Failed to process document '{file_name}': {e}"
+        )
+
+        raise RuntimeError(
+            f"Failed to process document '{file_name}': {e}"
+        ) from e

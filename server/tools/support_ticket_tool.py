@@ -21,7 +21,15 @@ def register_support_ticket_tools(mcp: FastMCP):
                 data = result,
                 error = None
             )
-    
+
+        except ValueError as e:
+            logger.warning(f"ValueError in create support ticket: {str(e)}")
+            return ToolResponse(
+                success=False,
+                data=None,
+                error=str(e)
+            )
+        
         except Exception as e:
             logger.exception(e)
             return ToolResponse(
@@ -43,6 +51,14 @@ def register_support_ticket_tools(mcp: FastMCP):
                 success = True,
                 data = result,
                 error = None
+            )
+        
+        except ValueError as e:
+            logger.warning(f"ValueError in get support ticket: {str(e)}")
+            return ToolResponse(
+                success=False,
+                data=None,
+                error=str(e)
             )
     
         except Exception as e:

@@ -10,8 +10,10 @@ from app.core.constant import MAXIMUM_TOOL_CALLS
 # call_llm
 # =========================
 async def call_llm(state: AgentState) -> AgentState:
+    """
+    call llm for generate answer.
+    """
     logger.info("Node:-call_llm")
-
     try:
         question = state.get("question", "")
 
