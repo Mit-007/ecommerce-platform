@@ -4,7 +4,6 @@ from app.core.logger import logger
 from app.database.repositories.invoice_repositories import (
     get_invoice_by_id,
     create_new_invoice,
-    update_invoice_by_id,
     delete_invoice_by_id,
     get_orders_by_invoice_id,
     update_invoice_status_by_id,
@@ -12,7 +11,6 @@ from app.database.repositories.invoice_repositories import (
 )
 from app.model.invoice_routes_schema import (
     CreateInvoice,
-    UpdateInvoice,
     UpdateInvoiceStatus,
 )
 
@@ -78,44 +76,6 @@ def create_invoice(request: CreateInvoice):
 
     except Exception as e:
         logger.error(f"Error while creating invoice: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=str(e),
-        )
-
-
-@router.put("/{invoice_id}")
-def update_invoice(
-    invoice_id: UUID,
-    request: UpdateInvoice,
-):
-    try:
-        invoice_data = update_invoice_by_id(
-            invoice_id=invoice_id,
-            invoice_number=request.invoice_number,
-            status=request.status.value,
-        )
-
-        if invoice_data is None:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Invoice with ID {invoice_id} not found.",
-            )
-
-        return invoice_data
-
-    except HTTPException:
-        raise
-
-    except ConnectionError as e:
-        logger.error(f"Database connection error: {e}")
-        raise HTTPException(
-            status_code=503,
-            detail=str(e),
-        )
-
-    except Exception as e:
-        logger.error(f"Error while updating invoice {invoice_id}: {e}")
         raise HTTPException(
             status_code=500,
             detail=str(e),

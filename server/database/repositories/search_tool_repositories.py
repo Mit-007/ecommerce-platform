@@ -1,5 +1,6 @@
 from typing import List
 from server.database.connection import get_db_connection, release_db_connection
+from server.core.constant import OUTPUT_DIMENSIONALITY
 from server.core.logger import logger
 
 def search_documents_by_vector(
@@ -27,8 +28,8 @@ def search_documents_by_vector(
     if not embedding or not isinstance(embedding, (list, tuple)):
         raise ValueError("Embedding must be a non-empty list or tuple of floats")
     
-    if len(embedding) != 3072:
-        raise ValueError("Embedding must have exactly 3072 dimensions")
+    if len(embedding) != OUTPUT_DIMENSIONALITY:
+        raise ValueError(f"Embedding must have exactly {OUTPUT_DIMENSIONALITY} dimensions")
     
     conn = None
     cur = None

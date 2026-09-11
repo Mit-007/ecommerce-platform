@@ -59,7 +59,7 @@ def create_new_order(
         release_db_connection(conn, cur)
 
 
-def get_order_by_id(order_id: str):
+def get_order_by_id(order_id: UUID):
     conn = cur = None
 
     try:
@@ -78,7 +78,7 @@ def get_order_by_id(order_id: str):
             FROM orders
             WHERE order_id = %s
             """,
-            (order_id,)
+            (str(order_id),)
         )
 
         order = cur.fetchone()
@@ -106,7 +106,7 @@ def get_order_by_id(order_id: str):
 
 
 def update_order_status_by_id(
-    order_id: str,
+    order_id: UUID,
     status: str,
 ):
     conn = cur = None
@@ -132,7 +132,7 @@ def update_order_status_by_id(
             """,
             (
                 status,
-                order_id,
+                str(order_id),
             )
         )
 
@@ -164,7 +164,7 @@ def update_order_status_by_id(
         release_db_connection(conn, cur)
 
 
-def delete_order_by_id(order_id: str):
+def delete_order_by_id(order_id: UUID):
     conn = cur = None
 
     try:
@@ -176,7 +176,7 @@ def delete_order_by_id(order_id: str):
             WHERE order_id = %s
             RETURNING order_id
             """,
-            (order_id,)
+            (str(order_id),)
         )
 
         result = cur.fetchone()

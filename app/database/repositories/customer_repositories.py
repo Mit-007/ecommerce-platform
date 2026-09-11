@@ -7,7 +7,7 @@ def create_new_customer(name: str, email: str, password: str):
     try:
         conn, cur = get_db_connection()
 
-        hased_password = hash_password(password)
+        hashed_password = hash_password(password)
         
         cur.execute(
             """
@@ -15,7 +15,7 @@ def create_new_customer(name: str, email: str, password: str):
             VALUES (%s, %s, %s)
             RETURNING customer_id, name, email, created_at
             """,
-            (name, email, hased_password)
+            (name, email, hashed_password)
         )
 
         created_customer = cur.fetchone()

@@ -31,7 +31,7 @@ def store_documents_bulk(
                 original_text,
                 embedding_vector,
                 metadata,
-                created_at;
+                created_at
         """
 
         values = [

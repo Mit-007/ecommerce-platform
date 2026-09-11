@@ -1,3 +1,14 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+current_datetime = datetime.now(ZoneInfo("Asia/Kolkata"))
+
+dateTime = {
+    "current_date" : current_datetime.strftime("%Y-%m-%d"),
+    "current_time" : current_datetime.strftime("%H:%M:%S"),
+    "current_weekday" : current_datetime.strftime("%A"),
+}
+
 company = {
     "company_name" : "BuyZaar",
     "company_email": "support@buyzaar.com",

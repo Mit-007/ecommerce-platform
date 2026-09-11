@@ -1,7 +1,7 @@
 from pathlib import Path
 from jinja2 import Template
 from app.core.logger import logger
-from app.core.constant import company
+from app.core.constant import company , dateTime
 from app.core.config import PROMPT_FILE_PATH
 
 # ============================================================
@@ -61,6 +61,7 @@ def get_chat_agent_prompt(
         )
 
     return _chat_agent_template.render(
+        dateTime = dateTime,
         company = company,
         question=question,
         previous_chat=previous_chat,

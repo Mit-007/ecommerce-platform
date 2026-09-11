@@ -144,7 +144,7 @@ def cancel_order_by_id(order_id: str):
             SET
                 status = 'cancelled',
                 updated_at = CURRENT_TIMESTAMP
-            WHERE order_id = %s
+            WHERE order_id = %s AND status = 'pending'
             RETURNING
                 order_id,
                 customer_id,

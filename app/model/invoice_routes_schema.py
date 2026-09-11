@@ -16,11 +16,5 @@ class CreateInvoice(BaseModel):
     invoice_number: str = Field(...,min_length=1,max_length=255,)
     status: InvoiceStatus = InvoiceStatus.DRAFT
 
-
-class UpdateInvoice(BaseModel):
-    invoice_number: str = Field(...,min_length=1,max_length=255,)
-    status: InvoiceStatus
-
-
 class UpdateInvoiceStatus(BaseModel):
     status: InvoiceStatus

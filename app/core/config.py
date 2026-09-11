@@ -12,11 +12,12 @@ def error_msg(missing_variable):
 
 
 # -------------
-# promtp file path
+# prompt file path
 # -------------
-PROMPT_FILE_PATH = Path(os.getenv("PROMPT_FILE_PATH"))
-if not PROMPT_FILE_PATH:
+prompt_path = os.getenv("PROMPT_FILE_PATH")
+if not prompt_path:
     raise ValueError(error_msg("PROMPT_FILE_PATH"))
+PROMPT_FILE_PATH = Path(prompt_path)
 
 
 # -------------

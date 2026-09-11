@@ -27,8 +27,7 @@ async def call_llm(state: AgentState) -> AgentState:
             question=question,
             previous_chat=previous_chat,
             tool_call_log=tool_call_log,
-        )
-
+        )   
         # Get LLM
         llm = get_llm()
 
@@ -112,7 +111,7 @@ async def tool_node(
             raise RuntimeError("MCP tools are not available.")
 
         # Get tool calls
-        tool_calls = state.get("tool_calls",[],)
+        tool_calls = state.get("tool_calls",[])
 
         if not tool_calls:
             logger.info("No tool calls to execute.")
@@ -122,7 +121,7 @@ async def tool_node(
             }
 
         # Get existing tool log
-        tool_call_log = state.get("tool_call_log",[],)
+        tool_call_log = state.get("tool_call_log",[])
 
         # --------------
         # Execute tools

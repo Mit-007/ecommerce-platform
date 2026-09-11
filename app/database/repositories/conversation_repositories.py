@@ -7,7 +7,7 @@ from app.database.connection import (
 )
 
 
-def get_conversation_by_id(conversation_id: UUID) -> dict | None:
+def get_conversation_by_id(conversation_id: UUID) -> tuple | None:
     """
     Retrieve a conversation by conversation_id.
 
@@ -184,7 +184,7 @@ def get_all_conversations_by_customer(
 def create_new_conversation(
     customer_id: UUID,
     title: str | None = None,
-) -> UUID:
+) -> tuple:
 
     conn = None
     cur = None

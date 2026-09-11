@@ -12,5 +12,5 @@ class LoginCustomerRequest(BaseModel):
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
 
-class ChnagePassword(BaseModel):
+class ChangePassword(BaseModel):
     new_password : str = Field(...,min_length=8,description="Customer new password",)

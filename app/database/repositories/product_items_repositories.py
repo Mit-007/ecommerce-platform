@@ -33,12 +33,12 @@ def create_order_products_bulk(
                 name,
                 quantity,
                 returnable,
-                created_at;
+                created_at
         """
 
         values = [
             (
-                order_id,
+                str(order_id),
                 product.name,
                 product.quantity,
                 returnable,

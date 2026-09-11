@@ -102,66 +102,6 @@ def create_new_invoice(
     finally:
         release_db_connection(conn, cur)
 
-
-def update_invoice_by_id(
-    invoice_id: UUID,
-    invoice_number: str,
-    status: str,
-):
-    conn = cur = None
-
-    try:
-        conn, cur = get_db_connection()
-
-        cur.execute(
-            """
-            UPDATE invoice
-            SET
-                invoice_number = %s,
-                status = %s
-            WHERE invoice_id = %s
-            RETURNING
-                invoice_id,
-                customer_id,
-                invoice_number,
-                status,
-                created_at
-            """,
-            (
-                invoice_number,
-                status,
-                str(invoice_id),
-            )
-        )
-
-        invoice = cur.fetchone()
-
-        if not invoice:
-            raise Exception(
-                f"Invoice with id '{invoice_id}' not found"
-            )
-
-        columns = [desc[0] for desc in cur.description]
-
-        conn.commit()
-
-        return dict(zip(columns, invoice))
-
-    except ConnectionError:
-        raise
-
-    except Exception as e:
-        if conn:
-            conn.rollback()
-
-        raise Exception(
-            f"Failed to update invoice: {e}"
-        )
-
-    finally:
-        release_db_connection(conn, cur)
-
-
 def delete_invoice_by_id(invoice_id: UUID):
     conn = cur = None
 

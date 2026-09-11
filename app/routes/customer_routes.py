@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from uuid import UUID
-from app.model.auth_routes_schema import ChnagePassword
+from app.model.auth_routes_schema import ChangePassword
 from app.database.repositories.customer_repositories import (
     update_customer_password,
     delete_customer_by_id,
@@ -43,7 +43,7 @@ def get_customer(customer_id: UUID):
 
 
 @router.put("/{customer_id}")
-def change_customer_password(customer_id: UUID, request:ChnagePassword):
+def change_customer_password(customer_id: UUID, request:ChangePassword):
     try:
         result = update_customer_password(
             customer_id,
