@@ -129,3 +129,6 @@ coverage.xml
 # temp 
 
 /temp
+/full_frontend
+/bug
+main1.py
