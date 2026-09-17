@@ -40,7 +40,7 @@ def fetch_password_by_email(email: str):
         
         cur.execute(
             """
-            SELECT customer_id,password FROM customer WHERE email = %s
+            SELECT customer_id,name,email,password FROM customer WHERE email = %s
             """,
             (email,)
         )
@@ -49,7 +49,9 @@ def fetch_password_by_email(email: str):
         
         return {
             "customer_id": result[0],
-            "password": result[1],
+            "name":result[1],
+            "email":result[2],
+            "password": result[3],
         }
 
     except ConnectionError:
