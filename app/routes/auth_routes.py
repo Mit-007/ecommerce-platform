@@ -24,12 +24,17 @@ def register_new_customer(request: RegisterCustomerRequest):
     """
     try:
         new_customer = create_new_customer(
-            request.name,
-            request.email,
+            request.name.strip(),
+            request.email.lower().strip(),
             request.password,
         )
 
-        return new_customer
+        return {
+            "customer_id": str(new_customer[0]),
+            "name": new_customer[1],
+            "email": new_customer[2],
+            "created_at": new_customer[3],
+        }
 
     except HTTPException:
         raise
@@ -55,9 +60,8 @@ def login_user(request: LoginCustomerRequest):
     login a customer with email and password.
     """
     try:
-        customer_data = fetch_password_by_email(
-            request.email
-        )
+        email = request.email.lower().strip()
+        customer_data = fetch_password_by_email(email)
 
         if customer_data is None:
             raise HTTPException(
@@ -74,14 +78,25 @@ def login_user(request: LoginCustomerRequest):
                 detail="Incorrect password. Please try again.",
             )
 
-        data = {
-            "sub": str(customer_data["customer_id"])
+        token_data = {
+            "sub": str(customer_data["customer_id"]),
+            "email": customer_data["email"],
+            "name": customer_data["name"],
         }
+
+        access_token = create_access_token(token_data)
+        refresh_token = create_refresh_token(token_data)
 
         return {
             "message": "You are logged in successfully.",
-            "access_token": create_access_token(data),
-            "refresh_token": create_refresh_token(data),
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "customer": {
+                "customer_id": str(customer_data["customer_id"]),
+                "name": customer_data["name"],
+                "email": customer_data["email"],
+            },
         }
 
     except HTTPException:
@@ -112,6 +127,12 @@ def refresh_token(request: RefreshTokenRequest):
             request.refresh_token
         )
 
+        if not new_access_token:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid or expired refresh token.",
+            )
+
         return {
             "access_token": new_access_token,
             "token_type": "bearer",
@@ -119,13 +140,6 @@ def refresh_token(request: RefreshTokenRequest):
 
     except HTTPException:
         raise
-
-    except ConnectionError as e:
-        logger.error(f"Database connection error: {e}")
-        raise HTTPException(
-            status_code=503,
-            detail=str(e),
-        )
 
     except Exception as e:
         logger.error(f"Error while refreshing token: {e}")

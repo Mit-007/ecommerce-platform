@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from uuid import UUID
 from app.core.logger import logger
 from app.model.tracking_event_routes_schema import CreateTrackingEvent
-from app.database.repositories.order_repositories import tracking_order_by_id
+from app.database.repositories.order_repositories import tracking_order_by_id,get_order_by_id
 from app.database.repositories.tracking_repositories import create_tracking_event
 
 router = APIRouter(prefix="/orders",tags=["tracking order"])
@@ -13,6 +13,13 @@ def create_order_tracking(order_id: UUID,data: CreateTrackingEvent):
     create new tracking event for order.
     """
     try:
+        order_data = get_order_by_id(order_id)
+        if order_data is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Order with ID {order_id} not found.",
+            )
+        
         tracking_event = create_tracking_event(
             order_id=order_id,
             status=data.status.value,
@@ -51,6 +58,13 @@ def tracking_order(order_id: UUID):
     list all track events for order.
     """
     try:
+        order_data = get_order_by_id(order_id)
+        if order_data is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Order with ID {order_id} not found.",
+            )
+        
         tracking_event_list = tracking_order_by_id(order_id)
 
         if tracking_event_list is None:

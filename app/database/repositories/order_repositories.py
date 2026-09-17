@@ -1,17 +1,24 @@
 from app.database.connection import get_db_connection,release_db_connection
+from psycopg2.extras import execute_values
 from uuid import UUID
 
-def create_new_order(
+def create_order_with_products(
     customer_id: UUID,
     invoice_id: UUID,
+    products_list: list,
     status: str = "pending",
     estimated_delivery_date=None,
+    returnable: bool = False,
 ):
     conn = cur = None
 
     try:
+        if not products_list:
+            raise ValueError("Products list cannot be empty.")
+
         conn, cur = get_db_connection()
 
+        # 1. Create Order
         cur.execute(
             """
             INSERT INTO orders (
@@ -35,16 +42,62 @@ def create_new_order(
                 str(invoice_id),
                 status,
                 estimated_delivery_date,
-            )
+            ),
         )
 
         order = cur.fetchone()
+        order_columns = [desc[0] for desc in cur.description]
 
-        columns = [desc[0] for desc in cur.description]
+        order_data = dict(zip(order_columns, order))
 
+        order_id = order_data["order_id"]
+
+        # 2. Create Order Products
+        query = """
+            INSERT INTO product_item (
+                order_id,
+                name,
+                quantity,
+                returnable
+            )
+            VALUES %s
+            RETURNING
+                product_item_id,
+                order_id,
+                name,
+                quantity,
+                returnable,
+                created_at
+        """
+
+        values = [
+            (
+                str(order_id),
+                product.name,
+                product.quantity,
+                returnable,
+            )
+            for product in products_list
+        ]
+
+        inserted_products = execute_values(
+            cur,
+            query,
+            values,
+            fetch=True,
+        )
+
+        product_columns = [desc[0] for desc in cur.description]
+
+        product_data = [
+            dict(zip(product_columns, product))
+            for product in inserted_products
+        ]
+
+        # 3. Commit Both Operations
         conn.commit()
 
-        return dict(zip(columns, order))
+        return order_data,product_data 
 
     except ConnectionError:
         raise
@@ -53,7 +106,9 @@ def create_new_order(
         if conn:
             conn.rollback()
 
-        raise Exception(f"Failed to create order: {e}")
+        raise Exception(
+            f"Failed to create order with products: {e}"
+        )
 
     finally:
         release_db_connection(conn, cur)
@@ -84,9 +139,7 @@ def get_order_by_id(order_id: UUID):
         order = cur.fetchone()
 
         if not order:
-            raise Exception(
-                f"Order with id '{order_id}' not found"
-            )
+            return None
 
         columns = [desc[0] for desc in cur.description]
 
@@ -139,9 +192,7 @@ def update_order_status_by_id(
         order = cur.fetchone()
 
         if not order:
-            raise Exception(
-                f"Order with id '{order_id}' not found"
-            )
+            return None
 
         columns = [desc[0] for desc in cur.description]
 
@@ -182,9 +233,7 @@ def delete_order_by_id(order_id: UUID):
         result = cur.fetchone()
 
         if not result:
-            raise Exception(
-                f"Order with id '{order_id}' not found"
-            )
+            return None
 
         conn.commit()
 
@@ -232,9 +281,7 @@ def tracking_order_by_id(order_id: UUID):
         tracking_events = cur.fetchall()
 
         if not tracking_events:
-            raise Exception(
-                f"No tracking events found for order '{order_id}'"
-            )
+            return None
 
         columns = [desc[0] for desc in cur.description]
 
@@ -280,9 +327,7 @@ def list_products_by_id(order_id: UUID):
         products = cur.fetchall()
 
         if not products:
-            raise Exception(
-                f"No products found for order '{order_id}'"
-            )
+            return None
 
         columns = [desc[0] for desc in cur.description]
 

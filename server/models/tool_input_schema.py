@@ -10,7 +10,7 @@ class CreateSupportTicket(BaseModel):
     conversation_id : str = Field(...,description="provide a conversation id ")
 
 class GetSupportTicket(BaseModel):
-    support_ticket_id: str = Field(..., description="The order ID")
+    support_ticket_id: str = Field(..., description="The unique support ticket ID")
 
 class searchQuery(BaseModel):
     query: str = Field(...,description="give query for performe a similarity search")

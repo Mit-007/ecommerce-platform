@@ -47,9 +47,6 @@ def fetch_password_by_email(email: str):
 
         result = cur.fetchone()
         
-        if not result:
-            raise Exception(f"Customer with email '{email}' not found")
-        
         return {
             "customer_id": result[0],
             "password": result[1],
@@ -87,11 +84,6 @@ def get_customer_by_id(customer_id: UUID):
 
         result = cur.fetchone()
 
-        if not result:
-            raise Exception(
-                f"Customer with id '{customer_id}' not found"
-            )
-
         return {
             "customer_id": result[0],
             "name": result[1],
@@ -121,6 +113,8 @@ def update_customer_password(
     try:
         conn, cur = get_db_connection()
 
+        hashed_password = hash_password(password)
+
         cur.execute(
             """
             UPDATE customer
@@ -128,15 +122,13 @@ def update_customer_password(
             WHERE customer_id = %s
             """,
             (
-                password,
+                hashed_password,
                 str(customer_id),
             )
         )
 
         if cur.rowcount == 0:
-            raise Exception(
-                f"Customer with id '{customer_id}' not found"
-            )
+            return None
 
         conn.commit()
 

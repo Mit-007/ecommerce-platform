@@ -1,8 +1,9 @@
 from pathlib import Path
 from jinja2 import Template
 from app.core.logger import logger
-from app.core.constant import company , dateTime
+from app.core.constant import company
 from app.core.config import PROMPT_FILE_PATH
+from app.utils.datetime_utils import get_current_datetime
 
 # ============================================================
 # Prompt initialization
@@ -59,6 +60,8 @@ def get_chat_agent_prompt(
             "Chat agent prompt is not initialized. "
             "Call initialize_prompt_templates() first."
         )
+
+    dateTime = get_current_datetime()
 
     return _chat_agent_template.render(
         dateTime = dateTime,

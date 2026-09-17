@@ -41,9 +41,7 @@ def create_tracking_event(
         tracking_event = cur.fetchone()
 
         if not tracking_event:
-            raise Exception(
-                "Failed to create tracking event."
-            )
+            return None
 
         columns = [
             description[0]

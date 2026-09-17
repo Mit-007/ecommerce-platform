@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from uuid import UUID
+from fastapi import APIRouter, HTTPException ,Depends
 from app.database.repositories.conversation_repositories import (
     get_conversation_by_id,
     append_conversation_messages,
@@ -8,17 +9,19 @@ from app.agent.graph import agent
 from app.core.logger import logger
 from app.model.support_agent_schema import AgentRequest
 from app.services.extract_response import extract_response_text
+from app.dependencies.auth import get_current_customer
 
 router = APIRouter(prefix="/agent",tags=["Chat Bot Routes"])
 
 @router.post("/call")
-async def call_ai_agent(request: AgentRequest):
+async def call_ai_agent(request: AgentRequest,current_customer: dict = Depends(get_current_customer)):
     """
     invoke agent and return llm response.
     """
     try:
         user_question = request.message.strip()
         conversation_id = request.conversation_id
+        customer_id = UUID(current_customer["customer_id"])
 
         if not user_question:
             raise HTTPException(
@@ -30,7 +33,7 @@ async def call_ai_agent(request: AgentRequest):
 
         if not conversation_id:
             new_conversation = create_new_conversation(
-                request.customer_id,
+                customer_id,
                 title=user_question[:25].rstrip(),
             )
 

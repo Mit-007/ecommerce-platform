@@ -60,9 +60,11 @@ def chunk_and_store_document(
         # 4. Store in database
         # --------------------------------
 
-        inserted_count = store_documents_bulk(
+        inserted_rows = store_documents_bulk(
             documents_list=documents
         )
+
+        inserted_count = len(inserted_rows)
 
         logger.debug(
             f"Successfully processed document "

@@ -124,10 +124,6 @@ def extract_response_text(response: Any) -> str:
         return f"[Error extracting response: {str(e)}]"
 
 
-from typing import Any
-from app.core.logger import logger
-
-
 def extract_embedding_vector(response: Any) -> list[float]:
     """
     Extract an embedding vector from an embedding model response.

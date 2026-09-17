@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException ,Depends
 from app.model.document_routes_schema import DocumentRequest
 from app.services.chunk_store_service import chunk_and_store_document
 from app.core.logger import logger
+from app.dependencies.auth import get_current_customer
 
 router = APIRouter(prefix="/documents",tags=["Documents"],)
 
 @router.post("/upload")
-def upload_document(request: DocumentRequest):
+def upload_document(request: DocumentRequest,current_customer: dict = Depends(get_current_customer)):
     """
     Chunk the document, generate embeddings,
     and store all chunks in PostgreSQL.

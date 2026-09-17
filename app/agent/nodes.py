@@ -38,7 +38,7 @@ async def call_llm(state: AgentState) -> AgentState:
             raise RuntimeError("LLM service is not available.")
 
         logger.info(f"LLM call #{len(tool_call_log) + 1}")
-        result = llm.invoke(llm_prompt)
+        result = await llm.ainvoke(llm_prompt)
         logger.info("LLM response received")
 
         if result is None:
@@ -145,7 +145,7 @@ async def tool_node(state: AgentState) -> AgentState:
                 result = await tool.ainvoke(tool_args)
             except Exception as e:
                 logger.error(f"Tool execution failed for '{tool_name}': {e}")
-                raise RuntimeError(f"Tool '{tool_name}' execution failed: {e}") from e
+                result = {"success": False, "error": f"Tool execution failed: {str(e)}"}
 
             # Log execution
             tool_call_log.append({

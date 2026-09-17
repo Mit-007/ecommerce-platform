@@ -28,9 +28,7 @@ def get_invoice_by_id(invoice_id: UUID):
         invoice = cur.fetchone()
 
         if not invoice:
-            raise Exception(
-                f"Invoice with id '{invoice_id}' not found"
-            )
+            return None
 
         columns = [desc[0] for desc in cur.description]
 
@@ -120,9 +118,7 @@ def delete_invoice_by_id(invoice_id: UUID):
         result = cur.fetchone()
 
         if not result:
-            raise Exception(
-                f"Invoice with id '{invoice_id}' not found"
-            )
+            return None
 
         conn.commit()
 
@@ -172,9 +168,7 @@ def get_orders_by_invoice_id(invoice_id: UUID):
         orders = cur.fetchall()
 
         if not orders:
-            raise Exception(
-                f"No orders found for invoice '{invoice_id}'"
-            )
+            return None
 
         columns = [desc[0] for desc in cur.description]
 
@@ -226,9 +220,7 @@ def update_invoice_status_by_id(
         invoice = cur.fetchone()
 
         if not invoice:
-            raise Exception(
-                f"Invoice with id '{invoice_id}' not found"
-            )
+            return None
 
         columns = [desc[0] for desc in cur.description]
 
@@ -275,9 +267,7 @@ def get_customer_invoices(customer_id: UUID):
         invoices = cur.fetchall()
 
         if not invoices:
-            raise Exception(
-                f"No invoices found for customer '{customer_id}'"
-            )
+            return None
 
         columns = [desc[0] for desc in cur.description]
 
