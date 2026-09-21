@@ -27,15 +27,11 @@ def get_customer_conversations(
 
         conversations = get_all_conversations_by_customer(customer_id=customer_id)
 
-        if conversations is None:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Customer with ID {customer_id} not found.",
-            )
+        conversations_list = conversations if conversations is not None else []
 
         return {
             "customer_id": str(customer_id),
-            "conversations": conversations,
+            "conversations": conversations_list,
         }
 
     except HTTPException:

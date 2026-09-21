@@ -4,6 +4,7 @@ from app.core.logger import logger
 from app.core.constant import company
 from app.core.config import PROMPT_FILE_PATH
 from app.utils.datetime_utils import get_current_datetime
+from uuid import UUID
 
 # ============================================================
 # Prompt initialization
@@ -48,7 +49,8 @@ def initialize_prompt_templates() -> None:
 def get_chat_agent_prompt(
     question: str,
     previous_chat: list[dict],
-    tool_call_log: list[dict]
+    tool_call_log: list[dict],
+    conversation_id : UUID
 ) -> str:
     """
     Render the initialized chat agent prompt
@@ -69,4 +71,5 @@ def get_chat_agent_prompt(
         question=question,
         previous_chat=previous_chat,
         tool_call_log=tool_call_log,
+        conversation_id = conversation_id
     )

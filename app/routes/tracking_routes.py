@@ -28,8 +28,8 @@ def create_order_tracking(order_id: UUID,data: CreateTrackingEvent):
 
         if tracking_event is None:
             raise HTTPException(
-                status_code=404,
-                detail=f"Order with ID {order_id} not found.",
+                status_code=500,
+                detail="Failed to create tracking event.",
             )
 
         return tracking_event
@@ -67,13 +67,7 @@ def tracking_order(order_id: UUID):
         
         tracking_event_list = tracking_order_by_id(order_id)
 
-        if tracking_event_list is None:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Order with ID {order_id} not found.",
-            )
-
-        return tracking_event_list
+        return tracking_event_list if tracking_event_list is not None else []
 
     except HTTPException:
         raise

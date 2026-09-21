@@ -379,7 +379,7 @@ Escalate cases to human support when:
    - Why issue couldn't be resolved by AI
    - Number of retry attempts
 3. **Create Support Ticket**: Use `create_support_ticket` tool with:
-   - **conversation_id**: Always pass `"#conID"`
+   - **conversation_id**: Always pass `{{ conversation_id }}` 
    - **order_id**: Include if issue relates to a specific order
    - **summary**: Detailed summary of problem and all attempts
 4. **Provide Ticket Reference**: Give customer the ticket number

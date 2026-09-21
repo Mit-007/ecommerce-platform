@@ -23,14 +23,17 @@ async def call_llm(state: AgentState) -> AgentState:
 
         previous_chat = state.get("previous_chat", [])
         tool_call_log = state.get("tool_call_log", [])
+        conversation_id = state.get("conversation_id")
 
         # Create prompt with full context
         llm_prompt = get_chat_agent_prompt(
             question=question,
             previous_chat=previous_chat,
             tool_call_log=tool_call_log,
+            conversation_id=conversation_id
         )
-
+        logger.info(state)
+        logger.info(llm_prompt)
         # Get LLM
         llm = get_llm()
 
@@ -124,21 +127,13 @@ async def tool_node(state: AgentState) -> AgentState:
                 raise ValueError("Tool name is missing in tool call.")
 
             logger.info(f"Executing tool: {tool_name}")
+            logger.info(f"tool_args : {tool_args}")
 
             # Find tool
             tool = tools_dict.get(tool_name)
 
             if tool is None:
                 raise ValueError(f"Tool '{tool_name}' not found.")
-
-            # Add conversation_id for specific tools
-            if tool_name == "create_support_ticket":
-                conversation_id = state.get("conversation_id")
-                if not conversation_id:
-                    raise ValueError("conversation_id is required for create_support_ticket.")
-                if "request" not in tool_args:
-                    raise ValueError("Request data is missing for create_support_ticket.")
-                tool_args["request"]["conversation_id"] = conversation_id
 
             # Execute tool
             try:

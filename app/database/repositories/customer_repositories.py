@@ -46,6 +46,9 @@ def fetch_password_by_email(email: str):
         )
 
         result = cur.fetchone()
+
+        if not result:
+            return None
         
         return {
             "customer_id": result[0],
@@ -76,7 +79,6 @@ def get_customer_by_id(customer_id: UUID):
                 customer_id,
                 name,
                 email,
-                password,
                 created_at
             FROM customer
             WHERE customer_id = %s
@@ -86,12 +88,14 @@ def get_customer_by_id(customer_id: UUID):
 
         result = cur.fetchone()
 
+        if not result:
+            return None
+
         return {
             "customer_id": result[0],
             "name": result[1],
             "email": result[2],
-            "password": result[3],
-            "created_at": result[4],
+            "created_at": result[3],
         }
 
     except ConnectionError:

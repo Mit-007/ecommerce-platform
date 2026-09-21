@@ -38,7 +38,7 @@ def get_invoice(
 
         if str(invoice_data.get("customer_id")) != str(current_customer["customer_id"]):
             raise HTTPException(
-                status_code=4003,
+                status_code=403,
                 detail="Access forbidden: You can only access your own invoices.",
             )
 
@@ -138,8 +138,8 @@ def delete_invoice(
 
         if result is None:
             raise HTTPException(
-                status_code=404,
-                detail=f"Invoice with ID {invoice_id} not found.",
+                status_code=500,
+                detail="Failed to delete invoice.",
             )
 
         return result
@@ -187,13 +187,7 @@ def list_invoice_orders(
 
         orders = get_orders_by_invoice_id(invoice_id)
 
-        if orders is None:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Invoice with ID {invoice_id} not found.",
-            )
-
-        return orders
+        return orders if orders is not None else []
 
     except HTTPException:
         raise
@@ -244,8 +238,8 @@ def update_invoice_status(
 
         if result is None:
             raise HTTPException(
-                status_code=404,
-                detail=f"Invoice with ID {invoice_id} not found.",
+                status_code=500,
+                detail="Failed to update invoice status.",
             )
 
         return result
@@ -286,13 +280,7 @@ def list_customer_invoices(
 
         invoices = get_customer_invoices(customer_id)
 
-        if invoices is None:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Customer with ID {customer_id} not found.",
-            )
-
-        return invoices
+        return invoices if invoices is not None else []
 
     except HTTPException:
         raise

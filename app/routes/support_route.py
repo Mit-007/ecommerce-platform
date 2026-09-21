@@ -54,6 +54,12 @@ async def call_ai_agent(request: AgentRequest,current_customer: dict = Depends(g
                     detail=f"Conversation with ID {conversation_id} not found.",
                 )
 
+            if str(conversation[1]) != str(customer_id):
+                raise HTTPException(
+                    status_code=403,
+                    detail="Access forbidden: You cannot access another customer's conversation.",
+                )
+
             past_conversation = conversation[3] or []
 
         input_state = {

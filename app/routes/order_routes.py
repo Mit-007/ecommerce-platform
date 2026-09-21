@@ -88,14 +88,6 @@ def get_order(order_id: UUID,current_customer: dict = Depends(get_current_custom
                 status_code=403,
                 detail="Access forbidden: You cannot view order items belonging to another customer.",
             )
-        
-        order_data = get_order_by_id(order_id)
-
-        if order_data is None:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Order with ID {order_id} not found.",
-            )
 
         return order_data
 
@@ -142,15 +134,15 @@ def update_order_status(
         
         result = update_order_status_by_id(
             order_id,
-            request.new_status,
+            request.new_status.value if hasattr(request.new_status, "value") else request.new_status,
         )
 
         if result is None:
             raise HTTPException(
-                status_code=404,
-                detail=f"Order with ID {order_id} not found.",
+                status_code=500,
+                detail="Failed to update order status.",
             )
-
+        
         return result
 
     except HTTPException:
@@ -194,10 +186,10 @@ def delete_order(order_id: UUID,current_customer: dict = Depends(get_current_cus
 
         if result is None:
             raise HTTPException(
-                status_code=404,
-                detail=f"Order with ID {order_id} not found.",
+                status_code=500,
+                detail="Failed to delete order.",
             )
-
+        
         return result
 
     except HTTPException:
@@ -239,13 +231,7 @@ def list_order_products(order_id: UUID,current_customer: dict = Depends(get_curr
         
         product_list = list_products_by_id(order_id)
 
-        if not product_list:
-            raise HTTPException(
-                status_code=404,
-                detail=f"No products found for order with ID {order_id}.",
-            )
-
-        return product_list
+        return product_list if product_list is not None else []
 
     except HTTPException:
         raise

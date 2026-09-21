@@ -150,6 +150,9 @@ def get_all_conversations_by_customer(
 
         rows = cur.fetchall()
 
+        if not rows:
+            return None
+
         conversations = []
 
         for row in rows:
