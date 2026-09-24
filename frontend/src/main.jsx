@@ -1,79 +1,1085 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { Bot, ChevronRight, CircleHelp, Clock3, FileText, LogOut, MapPin, Menu, Package, Send, ShoppingBag, Sparkles, Truck, UserRound, X } from 'lucide-react';
-import './styles.css';
+import React, { useEffect, useMemo, useState } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  Bot,
+  ChevronRight,
+  CircleHelp,
+  Clock3,
+  FileText,
+  LogOut,
+  MapPin,
+  Menu,
+  Package,
+  Send,
+  ShoppingBag,
+  Sparkles,
+  Truck,
+  UserRound,
+  X,
+} from "lucide-react";
+import "./styles.css";
 
 // `/api` is proxied to FastAPI by vite.config.js during development. This is
 // essential because the backend intentionally has no CORS/OPTIONS handler.
-const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
-const stored = JSON.parse(localStorage.getItem('buyzaar_session') || 'null');
-const fmtDate = (date) => date ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(date)) : '—';
-const titleCase = (value = '') => value.replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
+const API_URL = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
+const stored = JSON.parse(localStorage.getItem("buyzaar_session") || "null");
+const fmtDate = (date) =>
+  date
+    ? new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
+        new Date(date),
+      )
+    : "—";
+const titleCase = (value = "") =>
+  value.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 async function api(path, { token, ...options } = {}) {
   const response = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers }, ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+    ...options,
   });
   const body = await response.json().catch(() => null);
-  if (!response.ok) throw new Error(body?.detail || 'Something went wrong. Please try again.');
+  if (!response.ok)
+    throw new Error(body?.detail || "Something went wrong. Please try again.");
   return body;
 }
 
 function Auth({ onSession }) {
-  const [mode, setMode] = useState('login'); const [form, setForm] = useState({ name: '', email: '', password: '' }); const [busy, setBusy] = useState(false); const [error, setError] = useState('');
-  const submit = async e => { e.preventDefault(); setBusy(true); setError(''); try {
-    if (mode === 'register') { await api('/auth/register', { method: 'POST', body: JSON.stringify(form) }); }
-    const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email: form.email, password: form.password }) });
-    const session = { ...data.customer, access_token: data.access_token, refresh_token: data.refresh_token }; localStorage.setItem('buyzaar_session', JSON.stringify(session)); onSession(session);
-  } catch (err) { setError(err.message); } finally { setBusy(false); } };
-  return <main className="auth-page"><section className="auth-intro"><a className="brand" href="#"><ShoppingBag /> Buyzaar</a><div><span className="eyebrow">SHOP WITH CONFIDENCE</span><h1>Everything you need, with support that understands.</h1><p>Keep your orders close and get intelligent help whenever you need it.</p></div><div className="intro-card"><Sparkles /><div><strong>AI support, on your terms</strong><span>Track orders, find answers, and get help in seconds.</span></div></div></section><section className="auth-panel"><div className="auth-box"><h2>{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2><p>{mode === 'login' ? 'Sign in to manage your Buyzaar orders.' : 'Join Buyzaar for a simpler shopping experience.'}</p><form onSubmit={submit}>{mode === 'register' && <label>Full name<input required minLength="1" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name" /></label>}<label>Email address<input required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" /></label><label>Password<input required minLength={mode === 'register' ? 8 : 1} type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="••••••••" /></label>{error && <p className="form-error">{error}</p>}<button className="primary wide" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'} <ChevronRight size={17} /></button></form><p className="switch">{mode === 'login' ? "New to Buyzaar?" : 'Already have an account?'} <button onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}>{mode === 'login' ? 'Create an account' : 'Sign in'}</button></p></div></section></main>;
+  const [mode, setMode] = useState("login");
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      if (mode === "register") {
+        await api("/auth/register", {
+          method: "POST",
+          body: JSON.stringify(form),
+        });
+      }
+      const data = await api("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email: form.email, password: form.password }),
+      });
+      const session = {
+        ...data.customer,
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+      };
+      localStorage.setItem("buyzaar_session", JSON.stringify(session));
+      onSession(session);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <main className="auth-page">
+      <section className="auth-intro">
+        <a className="brand" href="#">
+          <ShoppingBag /> Buyzaar
+        </a>
+        <div>
+          <span className="eyebrow">SHOP WITH CONFIDENCE</span>
+          <h1>Everything you need, with support that understands.</h1>
+          <p>
+            Keep your orders close and get intelligent help whenever you need
+            it.
+          </p>
+        </div>
+        <div className="intro-card">
+          <Sparkles />
+          <div>
+            <strong>AI support, on your terms</strong>
+            <span>Track orders, find answers, and get help in seconds.</span>
+          </div>
+        </div>
+      </section>
+      <section className="auth-panel">
+        <div className="auth-box">
+          <h2>{mode === "login" ? "Welcome back" : "Create your account"}</h2>
+          <p>
+            {mode === "login"
+              ? "Sign in to manage your Buyzaar orders."
+              : "Join Buyzaar for a simpler shopping experience."}
+          </p>
+          <form onSubmit={submit}>
+            {mode === "register" && (
+              <label>
+                Full name
+                <input
+                  required
+                  minLength="1"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Your name"
+                />
+              </label>
+            )}
+            <label>
+              Email address
+              <input
+                required
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                placeholder="you@example.com"
+              />
+            </label>
+            <label>
+              Password
+              <input
+                required
+                minLength={mode === "register" ? 8 : 1}
+                type="password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                placeholder="••••••••"
+              />
+            </label>
+            {error && <p className="form-error">{error}</p>}
+            <button className="primary wide" disabled={busy}>
+              {busy
+                ? "Please wait…"
+                : mode === "login"
+                  ? "Sign in"
+                  : "Create account"}{" "}
+              <ChevronRight size={17} />
+            </button>
+          </form>
+          <p className="switch">
+            {mode === "login" ? "New to Buyzaar?" : "Already have an account?"}{" "}
+            <button
+              onClick={() => {
+                setMode(mode === "login" ? "register" : "login");
+                setError("");
+              }}
+            >
+              {mode === "login" ? "Create an account" : "Sign in"}
+            </button>
+          </p>
+        </div>
+      </section>
+    </main>
+  );
 }
 
-function Status({ value }) { return <span className={`status ${value || ''}`}>{titleCase(value || 'pending')}</span>; }
+function Status({ value }) {
+  return (
+    <span className={`status ${value || ""}`}>
+      {titleCase(value || "pending")}
+    </span>
+  );
+}
 function Chat({ session, conversations, setConversations }) {
-  const [conversationId, setConversationId] = useState(null); const [messages, setMessages] = useState([]); const [message, setMessage] = useState(''); const [sending, setSending] = useState(false);
-  const select = c => {
+  const [conversationId, setConversationId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const select = (c) => {
     setConversationId(c.conversation_id);
-    try { setMessages(Array.isArray(c.messages) ? c.messages : JSON.parse(c.messages || '[]')); }
-    catch { setMessages([]); }
+    try {
+      setMessages(
+        Array.isArray(c.messages) ? c.messages : JSON.parse(c.messages || "[]"),
+      );
+    } catch {
+      setMessages([]);
+    }
   };
-  const send = async e => { e.preventDefault(); const text = message.trim(); if (!text || sending) return; setMessage(''); setMessages(m => [...m, { role: 'user', content: text }]); setSending(true); try { const data = await api('/agent/call', { method: 'POST', token: session.access_token, body: JSON.stringify({ message: text, conversation_id: conversationId }) }); setConversationId(data.conversation_id); setMessages(m => [...m, { role: 'assistant', content: data.message }]); const next = await api(`/customer/${session.customer_id}/conversations`, { token: session.access_token }); setConversations(next.conversations || []); } catch (err) { setMessages(m => [...m, { role: 'assistant', content: `I couldn’t reach support right now: ${err.message}` }]); } finally { setSending(false); } };
-  return <div className="chat-layout"><aside className="chat-history"><button className="new-chat" onClick={() => { setConversationId(null); setMessages([]); }}>+ New conversation</button><p>RECENT CONVERSATIONS</p><div className="history-list">{conversations.length ? conversations.map(c => <button className={`history-item ${conversationId === c.conversation_id ? 'active' : ''}`} key={c.conversation_id} onClick={() => select(c)} title={`Open ${c.title || 'support conversation'}`}><span>{c.title || 'Support conversation'}</span><small>{fmtDate(c.updated_at)}</small></button>) : <small className="history-empty">Your previous chats will appear here.</small>}</div></aside><section className="chat-window"><div className="chat-head"><div className="bot-avatar"><Bot size={21} /></div><div><strong>Buyzaar Assistant</strong><span><i /> Online · usually replies instantly</span></div></div><div className="messages">{messages.length === 0 && <div className="empty-chat"><div className="bot-avatar"><Sparkles /></div><h2>How can I help today?</h2><p>Ask about an order, delivery, return, invoice, or anything else.</p><div className="suggestions">{['Where is my order?', 'What is your return policy?', 'I need help with a delivery'].map(q => <button key={q} onClick={() => setMessage(q)}>{q}</button>)}</div></div>}{messages.map((m, i) => <div className={`message ${m.role === 'user' ? 'outgoing' : 'incoming'}`} key={i}>{m.content}</div>)}{sending && <div className="message incoming typing"><span /><span /><span /></div>}</div><form className="chat-input" onSubmit={send}><input value={message} onChange={e => setMessage(e.target.value)} placeholder="Type your message…" aria-label="Message Buyzaar Assistant" autoComplete="off"/><button className="send" type="submit" aria-label="Send message" disabled={!message.trim() || sending}><Send size={18} /></button></form></section></div>;
+  const send = async (e) => {
+    e.preventDefault();
+    const text = message.trim();
+    if (!text || sending) return;
+    setMessage("");
+    setMessages((m) => [...m, { role: "user", content: text }]);
+    setSending(true);
+    try {
+      const data = await api("/agent/call", {
+        method: "POST",
+        token: session.access_token,
+        body: JSON.stringify({
+          message: text,
+          conversation_id: conversationId,
+        }),
+      });
+      setConversationId(data.conversation_id);
+      setMessages((m) => [...m, { role: "assistant", content: data.message }]);
+      const next = await api(`/customer/${session.customer_id}/conversations`, {
+        token: session.access_token,
+      });
+      setConversations(next.conversations || []);
+    } catch (err) {
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          content: `I couldn’t reach support right now: ${err.message}`,
+        },
+      ]);
+    } finally {
+      setSending(false);
+    }
+  };
+  return (
+    <div className="chat-layout">
+      <aside className="chat-history">
+        <button
+          className="new-chat"
+          onClick={() => {
+            setConversationId(null);
+            setMessages([]);
+          }}
+        >
+          + New conversation
+        </button>
+        <p>RECENT CONVERSATIONS</p>
+        <div className="history-list">
+          {conversations.length ? (
+            conversations.map((c) => (
+              <button
+                className={`history-item ${conversationId === c.conversation_id ? "active" : ""}`}
+                key={c.conversation_id}
+                onClick={() => select(c)}
+                title={`Open ${c.title || "support conversation"}`}
+              >
+                <span>{c.title || "Support conversation"}</span>
+                <small>{fmtDate(c.updated_at)}</small>
+              </button>
+            ))
+          ) : (
+            <small className="history-empty">
+              Your previous chats will appear here.
+            </small>
+          )}
+        </div>
+      </aside>
+      <section className="chat-window">
+        <div className="chat-head">
+          <div className="bot-avatar">
+            <Bot size={21} />
+          </div>
+          <div>
+            <strong>Buyzaar Assistant</strong>
+            <span>
+              <i /> Online · usually replies instantly
+            </span>
+          </div>
+        </div>
+        <div className="messages">
+          {messages.length === 0 && (
+            <div className="empty-chat">
+              <div className="bot-avatar">
+                <Sparkles />
+              </div>
+              <h2>How can I help today?</h2>
+              <p>
+                Ask about an order, delivery, return, invoice, or anything else.
+              </p>
+              <div className="suggestions">
+                {[
+                  "Where is my order?",
+                  "What is your return policy?",
+                  "I need help with a delivery",
+                ].map((q) => (
+                  <button key={q} onClick={() => setMessage(q)}>
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {messages.map((m, i) => (
+            <div
+              className={`message ${m.role === "user" ? "outgoing" : "incoming"}`}
+              key={i}
+            >
+              {m.content}
+            </div>
+          ))}
+          {sending && (
+            <div className="message incoming typing">
+              <span />
+              <span />
+              <span />
+            </div>
+          )}
+        </div>
+        <form className="chat-input" onSubmit={send}>
+          <input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Type your message…"
+            aria-label="Message Buyzaar Assistant"
+            autoComplete="off"
+          />
+          <button
+            className="send"
+            type="submit"
+            aria-label="Send message"
+            disabled={!message.trim() || sending}
+          >
+            <Send size={18} />
+          </button>
+        </form>
+      </section>
+    </div>
+  );
 }
 
 function App() {
-  const [session, setSession] = useState(stored); const [page, setPage] = useState('home'); const [menu, setMenu] = useState(false); const [invoices, setInvoices] = useState([]); const [conversations, setConversations] = useState([]); const [orders, setOrders] = useState([]); const [loading, setLoading] = useState(true); const [selectedOrder, setSelectedOrder] = useState(null); const [orderDetails, setOrderDetails] = useState(null); const [error, setError] = useState('');
-  const load = async () => { if (!session) return; setLoading(true); setError(''); try { const [invoiceData, convData] = await Promise.all([api(`/invoices/customer/${session.customer_id}`, { token: session.access_token }), api(`/customer/${session.customer_id}/conversations`, { token: session.access_token })]); setInvoices(invoiceData); setConversations(convData.conversations || []); const groups = await Promise.all(invoiceData.map(i => api(`/invoices/${i.invoice_id}/orders`, { token: session.access_token }))); setOrders(groups.flat()); } catch (err) { setError(err.message); } finally { setLoading(false); } };
-  useEffect(() => { load(); }, [session]);
-  const openOrder = async order => { setSelectedOrder(order); setOrderDetails(null); try { const [items, tracking] = await Promise.all([api(`/orders/${order.order_id}/items`, { token: session.access_token }), api(`/orders/${order.order_id}/tracking`, { token: session.access_token })]); setOrderDetails({ items, tracking }); } catch (err) { setError(err.message); } };
-  const logout = () => { localStorage.removeItem('buyzaar_session'); setSession(null); };
+  const [session, setSession] = useState(stored);
+  const [page, setPage] = useState("home");
+  const [menu, setMenu] = useState(false);
+  const [invoices, setInvoices] = useState([]);
+  const [conversations, setConversations] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [error, setError] = useState("");
+  const load = async () => {
+    if (!session) return;
+    setLoading(true);
+    setError("");
+    try {
+      const [invoiceData, convData] = await Promise.all([
+        api(`/invoices/customer/${session.customer_id}`, {
+          token: session.access_token,
+        }),
+        api(`/customer/${session.customer_id}/conversations`, {
+          token: session.access_token,
+        }),
+      ]);
+      setInvoices(invoiceData);
+      setConversations(convData.conversations || []);
+      const groups = await Promise.all(
+        invoiceData.map((i) =>
+          api(`/invoices/${i.invoice_id}/orders`, {
+            token: session.access_token,
+          }),
+        ),
+      );
+      setOrders(groups.flat());
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    load();
+  }, [session]);
+  const openOrder = async (order) => {
+    setSelectedOrder(order);
+    setOrderDetails(null);
+    try {
+      const [items, tracking] = await Promise.all([
+        api(`/orders/${order.order_id}/items`, { token: session.access_token }),
+        api(`/orders/${order.order_id}/tracking`, {
+          token: session.access_token,
+        }),
+      ]);
+      setOrderDetails({ items, tracking });
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  const logout = () => {
+    localStorage.removeItem("buyzaar_session");
+    setSession(null);
+  };
   if (!session) return <Auth onSession={setSession} />;
-  const nav = [['home', 'Overview', Package], ['orders', 'My orders', ShoppingBag], ['support', 'AI support', CircleHelp], ['account', 'Account', UserRound]];
-  return <div className="app-shell"><header><a className="brand" href="#" onClick={() => setPage('home')}><ShoppingBag /> Buyzaar</a><button className="mobile-menu" onClick={() => setMenu(!menu)}>{menu ? <X /> : <Menu />}</button><nav className={menu ? 'open' : ''}>{nav.map(([id, label, Icon]) => <button key={id} className={page === id ? 'current' : ''} onClick={() => { setPage(id); setMenu(false); }}><Icon size={18} />{label}</button>)}</nav><div className="account-pill"><span>{session.name?.charAt(0).toUpperCase()}</span><b>{session.name}</b><button onClick={logout} title="Sign out"><LogOut size={17} /></button></div></header><main className="content">{error && <div className="notice">{error}<button onClick={() => setError('')}>×</button></div>}{page === 'support' ? <Chat session={session} conversations={conversations} setConversations={setConversations} /> : <>{page === 'home' && <section className="hero"><div><span className="eyebrow">YOUR BUYZAAR SPACE</span><h1>Hello, {session.name?.split(' ')[0]}.</h1><p>Orders, deliveries, and helpful answers—all in one calm place.</p><button className="primary" onClick={() => setPage('support')}>Ask the AI assistant <Sparkles size={17} /></button></div><div className="hero-art"><Bot /><span>Your support<br />sidekick</span></div></section>}{page === 'account' ? <Account session={session} /> : <OrdersView orders={orders} invoices={invoices} loading={loading} page={page} openOrder={openOrder} setPage={setPage} />}</>}</main>{selectedOrder && <OrderModal order={selectedOrder} details={orderDetails} close={() => setSelectedOrder(null)} />}</div>;
+  const nav = [
+    ["home", "Overview", Package],
+    ["orders", "My orders", ShoppingBag],
+    ["support", "AI support", CircleHelp],
+    ["account", "Account", UserRound],
+  ];
+  return (
+    <div className="app-shell">
+      <header>
+        <a className="brand" href="#" onClick={() => setPage("home")}>
+          <ShoppingBag /> Buyzaar
+        </a>
+        <button className="mobile-menu" onClick={() => setMenu(!menu)}>
+          {menu ? <X /> : <Menu />}
+        </button>
+        <nav className={menu ? "open" : ""}>
+          {nav.map(([id, label, Icon]) => (
+            <button
+              key={id}
+              className={page === id ? "current" : ""}
+              onClick={() => {
+                setPage(id);
+                setMenu(false);
+              }}
+            >
+              <Icon size={18} />
+              {label}
+            </button>
+          ))}
+        </nav>
+        <div className="account-pill">
+          <span>{session.name?.charAt(0).toUpperCase()}</span>
+          <b>{session.name}</b>
+          <button onClick={logout} title="Sign out">
+            <LogOut size={17} />
+          </button>
+        </div>
+      </header>
+      <main className="content">
+        {error && (
+          <div className="notice">
+            {error}
+            <button onClick={() => setError("")}>×</button>
+          </div>
+        )}
+        {page === "support" ? (
+          <Chat
+            session={session}
+            conversations={conversations}
+            setConversations={setConversations}
+          />
+        ) : (
+          <>
+            {page === "home" && (
+              <section className="hero">
+                <div>
+                  <span className="eyebrow">YOUR BUYZAAR SPACE</span>
+                  <h1>Hello, {session.name?.split(" ")[0]}.</h1>
+                  <p>
+                    Orders, deliveries, and helpful answers—all in one calm
+                    place.
+                  </p>
+                  <button
+                    className="primary"
+                    onClick={() => setPage("support")}
+                  >
+                    Ask the AI assistant <Sparkles size={17} />
+                  </button>
+                </div>
+                <div className="hero-art">
+                  <Bot />
+                  <span>
+                    Your support
+                    <br />
+                    sidekick
+                  </span>
+                </div>
+              </section>
+            )}
+            {page === "account" ? (
+              <Account session={session} />
+            ) : (
+              <OrdersView
+                orders={orders}
+                invoices={invoices}
+                loading={loading}
+                page={page}
+                openOrder={openOrder}
+                setPage={setPage}
+              />
+            )}
+          </>
+        )}
+      </main>
+      {selectedOrder && (
+        <OrderModal
+          order={selectedOrder}
+          details={orderDetails}
+          close={() => setSelectedOrder(null)}
+        />
+      )}
+    </div>
+  );
 }
 
-function OrdersView({ orders, invoices, loading, page, openOrder, setPage }) { const recent = page === 'home' ? orders.slice(0, 3) : orders; return <section className="section"><div className="section-head"><div><span className="eyebrow">{page === 'home' ? 'AT A GLANCE' : 'PURCHASE HISTORY'}</span><h2>{page === 'home' ? 'Your recent orders' : 'My orders'}</h2></div>{page === 'home' && <button className="text-button" onClick={() => setPage('orders')}>View all <ChevronRight size={16} /></button>}</div>{loading ? <div className="loading">Loading your orders…</div> : recent.length ? <div className="orders-grid">{recent.map(order => <article className="order-card" key={order.order_id} onClick={() => openOrder(order)}><div className="order-icon"><Package /></div><div className="order-main"><div><span className="order-number">Order #{order.order_id.slice(0, 8).toUpperCase()}</span><Status value={order.status} /></div><p>Placed {fmtDate(order.created_at)}</p><small>Estimated arrival: <b>{fmtDate(order.estimated_delivery_date)}</b></small></div><ChevronRight className="chev" /></article>)}</div> : <div className="empty-state"><Package size={30}/><h3>No orders yet</h3><p>Your orders will appear here once they’re created.</p><button className="primary" onClick={() => setPage('support')}>Need help?</button></div>}{page === 'home' && <section className="help-banner"><div className="bot-avatar"><Bot /></div><div><strong>Need a hand with an order?</strong><span>Our AI assistant can find updates, explain policies, and more.</span></div><button className="secondary" onClick={() => setPage('support')}>Chat now</button></section>}{page === 'orders' && <div className="invoice-note"><FileText size={18} /> {invoices.length} invoice{invoices.length === 1 ? '' : 's'} linked to your account.</div>}</section> }
-function Account({ session }) { return <section className="account-page"><span className="eyebrow">ACCOUNT</span><h1>Your profile</h1><div className="profile-card"><div className="profile-avatar">{session.name?.charAt(0).toUpperCase()}</div><div><h2>{session.name}</h2><p>{session.email}</p><small>Manage your information securely through Buyzaar.</small></div></div></section> }
-function OrderModal({ order, details, close }) { return <div className="modal-backdrop" onMouseDown={close}><section className="order-modal" onMouseDown={e => e.stopPropagation()}><button className="modal-close" onClick={close}><X /></button><span className="eyebrow">ORDER DETAILS</span><h2>Order #{order.order_id.slice(0, 8).toUpperCase()}</h2><Status value={order.status} /><div className="modal-grid"><div><h3>Items</h3>{!details ? <p>Loading…</p> : details.items.length ? details.items.map(i => <div className="line" key={i.product_item_id}><span>{i.name}</span><b>× {i.quantity}</b></div>) : <p>No item details available.</p>}</div><div><h3>Delivery timeline</h3>{!details ? <p>Loading…</p> : details.tracking.length ? <ol className="timeline">{details.tracking.map(t => <li key={t.tracking_event_id}><b>{titleCase(t.status)}</b><span>{t.location || 'Update posted'} · {fmtDate(t.timestamp)}</span></li>)}</ol> : <p>No tracking events yet.</p>}</div></div><p className="delivery">Estimated delivery: <b>{fmtDate(order.estimated_delivery_date)}</b></p></section></div> }
+function OrdersView({ orders, invoices, loading, page, openOrder, setPage }) {
+  const recent = page === "home" ? orders.slice(0, 3) : orders;
+  return (
+    <section className="section">
+      <div className="section-head">
+        <div>
+          <span className="eyebrow">
+            {page === "home" ? "AT A GLANCE" : "PURCHASE HISTORY"}
+          </span>
+          <h2>{page === "home" ? "Your recent orders" : "My orders"}</h2>
+        </div>
+        {page === "home" && (
+          <button className="text-button" onClick={() => setPage("orders")}>
+            View all <ChevronRight size={16} />
+          </button>
+        )}
+      </div>
+      {loading ? (
+        <div className="loading">Loading your orders…</div>
+      ) : recent.length ? (
+        <div className="orders-grid">
+          {recent.map((order) => (
+            <article
+              className="order-card"
+              key={order.order_id}
+              onClick={() => openOrder(order)}
+            >
+              <div className="order-icon">
+                <Package />
+              </div>
+              <div className="order-main">
+                <div>
+                  <span className="order-number">
+                    Order #{order.order_id.slice(0, 8).toUpperCase()}
+                  </span>
+                  <Status value={order.status} />
+                </div>
+                <p>Placed {fmtDate(order.created_at)}</p>
+                <small>
+                  Estimated arrival:{" "}
+                  <b>{fmtDate(order.estimated_delivery_date)}</b>
+                </small>
+              </div>
+              <ChevronRight className="chev" />
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <Package size={30} />
+          <h3>No orders yet</h3>
+          <p>Your orders will appear here once they’re created.</p>
+          <button className="primary" onClick={() => setPage("support")}>
+            Need help?
+          </button>
+        </div>
+      )}
+      {page === "home" && (
+        <section className="help-banner">
+          <div className="bot-avatar">
+            <Bot />
+          </div>
+          <div>
+            <strong>Need a hand with an order?</strong>
+            <span>
+              Our AI assistant can find updates, explain policies, and more.
+            </span>
+          </div>
+          <button className="secondary" onClick={() => setPage("support")}>
+            Chat now
+          </button>
+        </section>
+      )}
+      {page === "orders" && (
+        <div className="invoice-note">
+          <FileText size={18} /> {invoices.length} invoice
+          {invoices.length === 1 ? "" : "s"} linked to your account.
+        </div>
+      )}
+    </section>
+  );
+}
+function Account({ session }) {
+  return (
+    <section className="account-page">
+      <span className="eyebrow">ACCOUNT</span>
+      <h1>Your profile</h1>
+      <div className="profile-card">
+        <div className="profile-avatar">
+          {session.name?.charAt(0).toUpperCase()}
+        </div>
+        <div>
+          <h2>{session.name}</h2>
+          <p>{session.email}</p>
+          <small>Manage your information securely through Buyzaar.</small>
+        </div>
+      </div>
+    </section>
+  );
+}
+function OrderModal({ order, details, close }) {
+  return (
+    <div className="modal-backdrop" onMouseDown={close}>
+      <section className="order-modal" onMouseDown={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={close}>
+          <X />
+        </button>
+        <span className="eyebrow">ORDER DETAILS</span>
+        <h2>Order #{order.order_id.slice(0, 8).toUpperCase()}</h2>
+        <Status value={order.status} />
+        <div className="modal-grid">
+          <div>
+            <h3>Items</h3>
+            {!details ? (
+              <p>Loading…</p>
+            ) : details.items.length ? (
+              details.items.map((i) => (
+                <div className="line" key={i.product_item_id}>
+                  <span>{i.name}</span>
+                  <b>× {i.quantity}</b>
+                </div>
+              ))
+            ) : (
+              <p>No item details available.</p>
+            )}
+          </div>
+          <div>
+            <h3>Delivery timeline</h3>
+            {!details ? (
+              <p>Loading…</p>
+            ) : details.tracking.length ? (
+              <ol className="timeline">
+                {details.tracking.map((t) => (
+                  <li key={t.tracking_event_id}>
+                    <b>{titleCase(t.status)}</b>
+                    <span>
+                      {t.location || "Update posted"} · {fmtDate(t.timestamp)}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p>No tracking events yet.</p>
+            )}
+          </div>
+        </div>
+        <p className="delivery">
+          Estimated delivery: <b>{fmtDate(order.estimated_delivery_date)}</b>
+        </p>
+      </section>
+    </div>
+  );
+}
 function TrackingView({ session }) {
-  const [orderId, setOrderId] = useState(''); const [events, setEvents] = useState([]); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
-  const stages = ['order_placed', 'processing', 'shipped', 'in_transit', 'delivered']; const current = Math.max(0, ...events.map(e => stages.indexOf(e.status)));
-  const track = async e => { e.preventDefault(); setBusy(true); setError(''); setEvents([]); try { setEvents(await api(`/orders/${orderId.trim()}/tracking`, { token: session.access_token })); } catch (err) { setError(err.message); } finally { setBusy(false); } };
-  return <section className="section tracking-page"><span className="eyebrow">DELIVERY TRACKING</span><h2>Track an order</h2><p className="page-copy">Enter the full order ID to see all delivery updates.</p><form className="tracking-form" onSubmit={track}><input required value={orderId} onChange={e => setOrderId(e.target.value)} placeholder="Enter your order ID"/><button className="primary" disabled={busy}>{busy ? 'Checking…' : 'Track order'} <Truck size={17}/></button></form>{error && <p className="form-error tracking-error">{error}</p>}{events.length > 0 && <div className="tracking-result"><div className="tracking-result-head"><div><span className="eyebrow">DELIVERY STATUS</span><h3>Order #{orderId.slice(0,8).toUpperCase()}</h3></div><Status value={events.at(-1)?.status}/></div><div className="progress-stages">{stages.map((stage, index) => <div className={index <= current ? 'complete' : ''} key={stage}><i>{index < current ? '✓' : index + 1}</i><span>{titleCase(stage)}</span></div>)}</div><ol className="tracking-events">{events.map(event => <li key={event.tracking_event_id}><i/><div><b>{titleCase(event.status)}</b><p><MapPin size={14}/>{event.location || 'Location update pending'}</p><small>{new Intl.DateTimeFormat(undefined,{dateStyle:'medium',timeStyle:'short'}).format(new Date(event.timestamp))}</small></div></li>)}</ol></div>}</section>;
+  const [orderId, setOrderId] = useState("");
+  const [events, setEvents] = useState([]);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const stages = [
+    "order_placed",
+    "processing",
+    "shipped",
+    "in_transit",
+    "delivered",
+  ];
+  const current = Math.max(0, ...events.map((e) => stages.indexOf(e.status)));
+  const track = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    setEvents([]);
+    try {
+      setEvents(
+        await api(`/orders/${orderId.trim()}/tracking`, {
+          token: session.access_token,
+        }),
+      );
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <section className="section tracking-page">
+      <span className="eyebrow">DELIVERY TRACKING</span>
+      <h2>Track an order</h2>
+      <p className="page-copy">
+        Enter the full order ID to see all delivery updates.
+      </p>
+      <form className="tracking-form" onSubmit={track}>
+        <input
+          required
+          value={orderId}
+          onChange={(e) => setOrderId(e.target.value)}
+          placeholder="Enter your order ID"
+        />
+        <button className="primary" disabled={busy}>
+          {busy ? "Checking…" : "Track order"} <Truck size={17} />
+        </button>
+      </form>
+      {error && <p className="form-error tracking-error">{error}</p>}
+      {events.length > 0 && (
+        <div className="tracking-result">
+          <div className="tracking-result-head">
+            <div>
+              <span className="eyebrow">DELIVERY STATUS</span>
+              <h3>Order #{orderId.slice(0, 8).toUpperCase()}</h3>
+            </div>
+            <Status value={events.at(-1)?.status} />
+          </div>
+          <div className="progress-stages">
+            {stages.map((stage, index) => (
+              <div className={index <= current ? "complete" : ""} key={stage}>
+                <i>{index < current ? "✓" : index + 1}</i>
+                <span>{titleCase(stage)}</span>
+              </div>
+            ))}
+          </div>
+          <ol className="tracking-events">
+            {events.map((event) => (
+              <li key={event.tracking_event_id}>
+                <i />
+                <div>
+                  <b>{titleCase(event.status)}</b>
+                  <p>
+                    <MapPin size={14} />
+                    {event.location || "Location update pending"}
+                  </p>
+                  <small>
+                    {new Intl.DateTimeFormat(undefined, {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    }).format(new Date(event.timestamp))}
+                  </small>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+    </section>
+  );
 }
-function InvoicesView({ session, invoices, orders, loading }) { const [selected, setSelected] = useState(null); return <section className="section invoice-page"><span className="eyebrow">BILLING</span><h2>Your invoices</h2>{loading ? <div className="loading">Loading invoices…</div> : invoices.length ? <><div className="invoice-grid">{invoices.map(invoice => <button className={`invoice-card ${selected?.invoice_id===invoice.invoice_id?'active':''}`} key={invoice.invoice_id} onClick={() => setSelected(invoice)}><FileText/><span><b>{invoice.invoice_number}</b><small>Issued {fmtDate(invoice.created_at)}</small></span><Status value={invoice.status}/><ChevronRight size={17}/></button>)}</div>{selected && <div className="invoice-detail"><div><span className="eyebrow">INVOICE DETAILS</span><h3>{selected.invoice_number}</h3><Status value={selected.status}/></div><div><small>Invoice ID</small><code>{selected.invoice_id}</code><small>Created</small><b>{fmtDate(selected.created_at)}</b></div><div><h4>Linked orders</h4>{orders.filter(o=>o.invoice_id===selected.invoice_id).map(o=><div className="line" key={o.order_id}><span>#{o.order_id.slice(0,8).toUpperCase()}</span><Status value={o.status}/></div>)}</div></div>}</> : <div className="empty-state"><FileText size={30}/><h3>No invoices yet</h3><p>Your invoices will appear here.</p></div>}</section>; }
-function Portal() { const [page,setPage]=useState('home'); const [session,setSession]=useState(stored); const [invoices,setInvoices]=useState([]); const [orders,setOrders]=useState([]); const [loading,setLoading]=useState(true); if(!session)return <Auth onSession={setSession}/>; useEffect(()=>{Promise.all([api(`/invoices/customer/${session.customer_id}`,{token:session.access_token})]).then(async([data])=>{setInvoices(data);setOrders((await Promise.all(data.map(i=>api(`/invoices/${i.invoice_id}/orders`,{token:session.access_token})))).flat());}).finally(()=>setLoading(false));},[session]); const nav=[['home','Overview',Package],['orders','My orders',ShoppingBag],['invoices','Invoices',FileText],['tracking','Track order',Truck],['support','AI support',CircleHelp]]; const body=page==='invoices'?<InvoicesView session={session} invoices={invoices} orders={orders} loading={loading}/>:page==='tracking'?<TrackingView session={session}/>:page==='support'?<Chat session={session} conversations={[]} setConversations={()=>{}}/>:<OrdersView orders={orders} invoices={invoices} loading={loading} page={page} openOrder={()=>{}} setPage={setPage}/>; return <div className="app-shell"><header><a className="brand"><ShoppingBag/> Buyzaar</a><nav>{nav.map(([id,label,Icon])=><button className={page===id?'current':''} onClick={()=>setPage(id)} key={id}><Icon size={18}/>{label}</button>)}</nav><div className="account-pill"><span>{session.name?.[0]}</span><b>{session.name}</b><button onClick={()=>{localStorage.removeItem('buyzaar_session');setSession(null)}}><LogOut size={17}/></button></div></header><main className={`content ${page==='support'?'support-content':''}`}>{body}</main></div>}
+function InvoicesView({ session, invoices, orders, loading }) {
+  const [selected, setSelected] = useState(null);
+  return (
+    <section className="section invoice-page">
+      <span className="eyebrow">BILLING</span>
+      <h2>Your invoices</h2>
+      {loading ? (
+        <div className="loading">Loading invoices…</div>
+      ) : invoices.length ? (
+        <>
+          <div className="invoice-grid">
+            {invoices.map((invoice) => (
+              <button
+                className={`invoice-card ${selected?.invoice_id === invoice.invoice_id ? "active" : ""}`}
+                key={invoice.invoice_id}
+                onClick={() => setSelected(invoice)}
+              >
+                <FileText />
+                <span>
+                  <b>{invoice.invoice_number}</b>
+                  <small>Issued {fmtDate(invoice.created_at)}</small>
+                </span>
+                <Status value={invoice.status} />
+                <ChevronRight size={17} />
+              </button>
+            ))}
+          </div>
+          {selected && (
+            <div className="invoice-detail">
+              <div>
+                <span className="eyebrow">INVOICE DETAILS</span>
+                <h3>{selected.invoice_number}</h3>
+                <Status value={selected.status} />
+              </div>
+              <div>
+                <small>Invoice ID</small>
+                <code>{selected.invoice_id}</code>
+                <small>Created</small>
+                <b>{fmtDate(selected.created_at)}</b>
+              </div>
+              <div>
+                <h4>Linked orders</h4>
+                {orders
+                  .filter((o) => o.invoice_id === selected.invoice_id)
+                  .map((o) => (
+                    <div className="line" key={o.order_id}>
+                      <span>#{o.order_id.slice(0, 8).toUpperCase()}</span>
+                      <Status value={o.status} />
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="empty-state">
+          <FileText size={30} />
+          <h3>No invoices yet</h3>
+          <p>Your invoices will appear here.</p>
+        </div>
+      )}
+    </section>
+  );
+}
+function Portal() {
+  const [page, setPage] = useState("home");
+  const [session, setSession] = useState(stored);
+  const [invoices, setInvoices] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  if (!session) return <Auth onSession={setSession} />;
+  useEffect(() => {
+    Promise.all([
+      api(`/invoices/customer/${session.customer_id}`, {
+        token: session.access_token,
+      }),
+    ])
+      .then(async ([data]) => {
+        setInvoices(data);
+        setOrders(
+          (
+            await Promise.all(
+              data.map((i) =>
+                api(`/invoices/${i.invoice_id}/orders`, {
+                  token: session.access_token,
+                }),
+              ),
+            )
+          ).flat(),
+        );
+      })
+      .finally(() => setLoading(false));
+  }, [session]);
+  const nav = [
+    ["home", "Overview", Package],
+    ["orders", "My orders", ShoppingBag],
+    ["invoices", "Invoices", FileText],
+    ["tracking", "Track order", Truck],
+    ["support", "AI support", CircleHelp],
+  ];
+  const body =
+    page === "invoices" ? (
+      <InvoicesView
+        session={session}
+        invoices={invoices}
+        orders={orders}
+        loading={loading}
+      />
+    ) : page === "tracking" ? (
+      <TrackingView session={session} />
+    ) : page === "support" ? (
+      <Chat session={session} conversations={[]} setConversations={() => {}} />
+    ) : (
+      <OrdersView
+        orders={orders}
+        invoices={invoices}
+        loading={loading}
+        page={page}
+        openOrder={() => {}}
+        setPage={setPage}
+      />
+    );
+  return (
+    <div className="app-shell">
+      <header>
+        <a className="brand">
+          <ShoppingBag /> Buyzaar
+        </a>
+        <nav>
+          {nav.map(([id, label, Icon]) => (
+            <button
+              className={page === id ? "current" : ""}
+              onClick={() => setPage(id)}
+              key={id}
+            >
+              <Icon size={18} />
+              {label}
+            </button>
+          ))}
+        </nav>
+        <div className="account-pill">
+          <span>{session.name?.[0]}</span>
+          <b>{session.name}</b>
+          <button
+            onClick={() => {
+              localStorage.removeItem("buyzaar_session");
+              setSession(null);
+            }}
+          >
+            <LogOut size={17} />
+          </button>
+        </div>
+      </header>
+      <main
+        className={`content ${page === "support" ? "support-content" : ""}`}
+      >
+        {body}
+      </main>
+    </div>
+  );
+}
 function AuthenticatedPortal({ session, logout }) {
-  const [page, setPage] = useState('home'); const [invoices, setInvoices] = useState([]); const [orders, setOrders] = useState([]); const [conversations, setConversations] = useState([]); const [loading, setLoading] = useState(true); const [selectedOrder, setSelectedOrder] = useState(null); const [orderDetails, setOrderDetails] = useState(null); const [error, setError] = useState('');
-  useEffect(() => { const load = async () => { try { const [invoiceData, conversationData] = await Promise.all([api(`/invoices/customer/${session.customer_id}`, { token: session.access_token }), api(`/customer/${session.customer_id}/conversations`, { token: session.access_token })]); setInvoices(invoiceData); setConversations(conversationData.conversations || []); setOrders((await Promise.all(invoiceData.map(i => api(`/invoices/${i.invoice_id}/orders`, { token: session.access_token })))).flat()); } catch (err) { setError(err.message); } finally { setLoading(false); } }; load(); }, [session]);
-  const openOrder = async order => { setSelectedOrder(order); setOrderDetails(null); try { const [items, tracking] = await Promise.all([api(`/orders/${order.order_id}/items`, { token: session.access_token }), api(`/orders/${order.order_id}/tracking`, { token: session.access_token })]); setOrderDetails({ items, tracking }); } catch (err) { setError(err.message); } };
-  const nav = [['home', 'Overview', Package], ['orders', 'My orders', ShoppingBag], ['invoices', 'Invoices', FileText], ['tracking', 'Track order', Truck], ['support', 'AI support', CircleHelp], ['account', 'Account', UserRound]];
-  let view = <OrdersView orders={orders} invoices={invoices} loading={loading} page={page} openOrder={openOrder} setPage={setPage} />;
-  if (page === 'support') view = <Chat session={session} conversations={conversations} setConversations={setConversations} />;
-  if (page === 'invoices') view = <InvoicesView session={session} invoices={invoices} orders={orders} loading={loading} />;
-  if (page === 'tracking') view = <TrackingView session={session} />;
-  if (page === 'account') view = <Account session={session} />;
-  return <div className="app-shell"><header><a className="brand" href="#" onClick={() => setPage('home')}><ShoppingBag/> Buyzaar</a><nav>{nav.map(([id,label,Icon]) => <button key={id} className={page === id ? 'current' : ''} onClick={() => setPage(id)}><Icon size={18}/>{label}</button>)}</nav><div className="account-pill"><span>{session.name?.[0]}</span><b>{session.name}</b><button onClick={logout}><LogOut size={17}/></button></div></header><main className={`content ${page === 'support' ? 'support-content' : ''}`}>{error && <div className="notice">{error}<button onClick={() => setError('')}>×</button></div>}{page === 'home' && <section className="hero"><div><span className="eyebrow">YOUR BUYZAAR SPACE</span><h1>Hello, {session.name?.split(' ')[0]}.</h1><p>Orders, deliveries, and helpful answers—all in one calm place.</p><button className="primary" onClick={() => setPage('support')}>Ask the AI assistant <Sparkles size={17}/></button></div><div className="hero-art"><Bot/><span>Your support<br/>sidekick</span></div></section>}{view}</main>{selectedOrder && <OrderModal order={selectedOrder} details={orderDetails} close={() => setSelectedOrder(null)}/>}</div>;
+  const [page, setPage] = useState("home");
+  const [invoices, setInvoices] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [invoiceData, conversationData] = await Promise.all([
+          api(`/invoices/customer/${session.customer_id}`, {
+            token: session.access_token,
+          }),
+          api(`/customer/${session.customer_id}/conversations`, {
+            token: session.access_token,
+          }),
+        ]);
+        setInvoices(invoiceData);
+        setConversations(conversationData.conversations || []);
+        setOrders(
+          (
+            await Promise.all(
+              invoiceData.map((i) =>
+                api(`/invoices/${i.invoice_id}/orders`, {
+                  token: session.access_token,
+                }),
+              ),
+            )
+          ).flat(),
+        );
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [session]);
+  const openOrder = async (order) => {
+    setSelectedOrder(order);
+    setOrderDetails(null);
+    try {
+      const [items, tracking] = await Promise.all([
+        api(`/orders/${order.order_id}/items`, { token: session.access_token }),
+        api(`/orders/${order.order_id}/tracking`, {
+          token: session.access_token,
+        }),
+      ]);
+      setOrderDetails({ items, tracking });
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  const nav = [
+    ["home", "Overview", Package],
+    ["orders", "My orders", ShoppingBag],
+    ["invoices", "Invoices", FileText],
+    ["tracking", "Track order", Truck],
+    ["support", "AI support", CircleHelp],
+    ["account", "Account", UserRound],
+  ];
+  let view = (
+    <OrdersView
+      orders={orders}
+      invoices={invoices}
+      loading={loading}
+      page={page}
+      openOrder={openOrder}
+      setPage={setPage}
+    />
+  );
+  if (page === "support")
+    view = (
+      <Chat
+        session={session}
+        conversations={conversations}
+        setConversations={setConversations}
+      />
+    );
+  if (page === "invoices")
+    view = (
+      <InvoicesView
+        session={session}
+        invoices={invoices}
+        orders={orders}
+        loading={loading}
+      />
+    );
+  if (page === "tracking") view = <TrackingView session={session} />;
+  if (page === "account") view = <Account session={session} />;
+  return (
+    <div className="app-shell">
+      <header>
+        <a className="brand" href="#" onClick={() => setPage("home")}>
+          <ShoppingBag /> Buyzaar
+        </a>
+        <nav>
+          {nav.map(([id, label, Icon]) => (
+            <button
+              key={id}
+              className={page === id ? "current" : ""}
+              onClick={() => setPage(id)}
+            >
+              <Icon size={18} />
+              {label}
+            </button>
+          ))}
+        </nav>
+        <div className="account-pill">
+          <span>{session.name?.[0]}</span>
+          <b>{session.name}</b>
+          <button onClick={logout}>
+            <LogOut size={17} />
+          </button>
+        </div>
+      </header>
+      <main
+        className={`content ${page === "support" ? "support-content" : ""}`}
+      >
+        {error && (
+          <div className="notice">
+            {error}
+            <button onClick={() => setError("")}>×</button>
+          </div>
+        )}
+        {page === "home" && (
+          <section className="hero">
+            <div>
+              <span className="eyebrow">YOUR BUYZAAR SPACE</span>
+              <h1>Hello, {session.name?.split(" ")[0]}.</h1>
+              <p>
+                Orders, deliveries, and helpful answers—all in one calm place.
+              </p>
+              <button className="primary" onClick={() => setPage("support")}>
+                Ask the AI assistant <Sparkles size={17} />
+              </button>
+            </div>
+            <div className="hero-art">
+              <Bot />
+              <span>
+                Your support
+                <br />
+                sidekick
+              </span>
+            </div>
+          </section>
+        )}
+        {view}
+      </main>
+      {selectedOrder && (
+        <OrderModal
+          order={selectedOrder}
+          details={orderDetails}
+          close={() => setSelectedOrder(null)}
+        />
+      )}
+    </div>
+  );
 }
-function RootPortal() { const [session, setSession] = useState(stored); return session ? <AuthenticatedPortal session={session} logout={() => { localStorage.removeItem('buyzaar_session'); setSession(null); }}/> : <Auth onSession={setSession}/>; }
-createRoot(document.getElementById('root')).render(<RootPortal />);
+function RootPortal() {
+  const [session, setSession] = useState(stored);
+  return session ? (
+    <AuthenticatedPortal
+      session={session}
+      logout={() => {
+        localStorage.removeItem("buyzaar_session");
+        setSession(null);
+      }}
+    />
+  ) : (
+    <Auth onSession={setSession} />
+  );
+}
+createRoot(document.getElementById("root")).render(<RootPortal />);
