@@ -421,6 +421,79 @@ def get_products_by_category(category: str, limit: int = 100, offset: int = 0) -
         release_db_connection(conn, cur)
 
 
+def get_all_categories() -> list[str]:
+    """
+    Fetch list of all distinct product categories.
+    """
+    conn = cur = None
+
+    try:
+        conn, cur = get_db_connection()
+
+        cur.execute(
+            """
+            SELECT DISTINCT category
+            FROM product
+            WHERE category IS NOT NULL AND TRIM(category) != ''
+            ORDER BY category ASC
+            """
+        )
+
+        rows = cur.fetchall()
+
+        if not rows:
+            return []
+
+        return [row[0] for row in rows]
+
+    except ConnectionError:
+        raise
+
+    except Exception as e:
+        raise Exception(f"Failed to fetch categories: {e}")
+
+    finally:
+        release_db_connection(conn, cur)
+
+
+def get_subcategories_by_category(category: str) -> list[str]:
+    """
+    Fetch list of all distinct subcategories for a given category.
+    """
+    conn = cur = None
+
+    try:
+        conn, cur = get_db_connection()
+
+        cur.execute(
+            """
+            SELECT DISTINCT sub_category
+            FROM product
+            WHERE LOWER(category) = LOWER(%s)
+              AND sub_category IS NOT NULL
+              AND TRIM(sub_category) != ''
+            ORDER BY sub_category ASC
+            """,
+            (category,),
+        )
+
+        rows = cur.fetchall()
+
+        if not rows:
+            return []
+
+        return [row[0] for row in rows]
+
+    except ConnectionError:
+        raise
+
+    except Exception as e:
+        raise Exception(f"Failed to fetch subcategories for category '{category}': {e}")
+
+    finally:
+        release_db_connection(conn, cur)
+
+
 def update_product_by_id(product_id: UUID, **fields) -> dict | None:
     """
     Update product fields by product_id.

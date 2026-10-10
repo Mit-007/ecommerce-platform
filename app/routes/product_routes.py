@@ -5,6 +5,8 @@ from app.database.repositories.product_repositories import (
     get_product_by_id,
     get_all_products,
     get_products_by_category,
+    get_all_categories,
+    get_subcategories_by_category,
     update_product_by_id,
     delete_product_by_id,
 )
@@ -90,6 +92,61 @@ def list_all_products(
 
     except Exception as e:
         logger.error(f"Error while fetching all products: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
+
+
+@router.get("/categories")
+def list_categories():
+    """
+    Get list of all product categories.
+    """
+    try:
+        categories = get_all_categories()
+        return categories
+
+    except HTTPException:
+        raise
+
+    except ConnectionError as e:
+        logger.error(f"Database connection error: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail=str(e),
+        )
+
+    except Exception as e:
+        logger.error(f"Error while fetching categories: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
+
+
+@router.get("/categories/{category}/subcategories")
+@router.get("/category/{category}/subcategories")
+def list_subcategories_by_category(category: str):
+    """
+    Get list of all subcategories for a given category.
+    """
+    try:
+        subcategories = get_subcategories_by_category(category)
+        return subcategories
+
+    except HTTPException:
+        raise
+
+    except ConnectionError as e:
+        logger.error(f"Database connection error: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail=str(e),
+        )
+
+    except Exception as e:
+        logger.error(f"Error while fetching subcategories for category '{category}': {e}")
         raise HTTPException(
             status_code=500,
             detail=str(e),
