@@ -14,17 +14,18 @@ class OrderStatus(str, Enum):
     RETURNED = "returned"
 
 class OrderItem(BaseModel):
-    name: str = Field(...,min_length=1,max_length=255,)
-    quantity: int = Field(...,gt=0,)
+    product_id: UUID = Field(..., description="Product ID")
+    quantity: int = Field(..., gt=0, description="Quantity of product")
+    returnable: bool = Field(False, description="Whether item is returnable")
 
 class CreateOrder(BaseModel):
     customer_id: UUID
     invoice_id: UUID
+    address_id: UUID
     status: OrderStatus = OrderStatus.PENDING
     estimated_delivery_date: date | None = None
     returnable: bool = False
-    product_list: list[OrderItem] = Field(...,min_length=1,)
+    product_list: list[OrderItem] = Field(..., min_length=1)
     
 class OrderStatusUpdate(BaseModel):
     new_status: OrderStatus
-

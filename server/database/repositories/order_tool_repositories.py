@@ -1,4 +1,5 @@
-from server.database.connection import get_db_connection,release_db_connection
+from server.database.connection import get_db_connection, release_db_connection
+
 
 def get_order_by_id(order_id: str):
     conn = cur = None
@@ -12,6 +13,7 @@ def get_order_by_id(order_id: str):
                 order_id,
                 customer_id,
                 invoice_id,
+                address_id,
                 status,
                 estimated_delivery_date,
                 created_at,
@@ -56,15 +58,21 @@ def list_order_items_by_order_id(order_id: str):
         cur.execute(
             """
             SELECT
-                product_item_id,
-                order_id,
-                name,
-                quantity,
-                returnable,
-                created_at
-            FROM product_item
-            WHERE order_id = %s
-            ORDER BY created_at ASC
+                pi.product_item_id,
+                pi.order_id,
+                pi.product_id,
+                p.name,
+                p.category,
+                p.sub_category,
+                p.price,
+                p.image_url,
+                pi.quantity,
+                pi.returnable,
+                pi.created_at
+            FROM product_item pi
+            LEFT JOIN product p ON pi.product_id = p.product_id
+            WHERE pi.order_id = %s
+            ORDER BY pi.created_at ASC
             """,
             (order_id,)
         )
@@ -89,6 +97,7 @@ def list_order_items_by_order_id(order_id: str):
 
     finally:
         release_db_connection(conn, cur)
+
 
 def track_order_by_id(order_id: str):
     conn = cur = None
@@ -132,6 +141,7 @@ def track_order_by_id(order_id: str):
     finally:
         release_db_connection(conn, cur)
 
+
 def cancel_order_by_id(order_id: str):
     conn = cur = None
 
@@ -149,6 +159,7 @@ def cancel_order_by_id(order_id: str):
                 order_id,
                 customer_id,
                 invoice_id,
+                address_id,
                 status,
                 estimated_delivery_date,
                 created_at,

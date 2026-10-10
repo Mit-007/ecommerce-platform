@@ -1,10 +1,12 @@
-from app.database.connection import get_db_connection,release_db_connection
+from app.database.connection import get_db_connection, release_db_connection
 from psycopg2.extras import execute_values
 from uuid import UUID
+
 
 def create_order_with_products(
     customer_id: UUID,
     invoice_id: UUID,
+    address_id: UUID,
     products_list: list,
     status: str = "pending",
     estimated_delivery_date=None,
@@ -24,14 +26,16 @@ def create_order_with_products(
             INSERT INTO orders (
                 customer_id,
                 invoice_id,
+                address_id,
                 status,
                 estimated_delivery_date
             )
-            VALUES (%s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s)
             RETURNING
                 order_id,
                 customer_id,
                 invoice_id,
+                address_id,
                 status,
                 estimated_delivery_date,
                 created_at,
@@ -40,6 +44,7 @@ def create_order_with_products(
             (
                 str(customer_id),
                 str(invoice_id),
+                str(address_id),
                 status,
                 estimated_delivery_date,
             ),
@@ -56,7 +61,7 @@ def create_order_with_products(
         query = """
             INSERT INTO product_item (
                 order_id,
-                name,
+                product_id,
                 quantity,
                 returnable
             )
@@ -64,7 +69,7 @@ def create_order_with_products(
             RETURNING
                 product_item_id,
                 order_id,
-                name,
+                product_id,
                 quantity,
                 returnable,
                 created_at
@@ -73,9 +78,9 @@ def create_order_with_products(
         values = [
             (
                 str(order_id),
-                product.name,
-                product.quantity,
-                returnable,
+                str(product.product_id if hasattr(product, "product_id") else product["product_id"]),
+                product.quantity if hasattr(product, "quantity") else product["quantity"],
+                getattr(product, "returnable", returnable) if hasattr(product, "returnable") else product.get("returnable", returnable),
             )
             for product in products_list
         ]
@@ -97,7 +102,7 @@ def create_order_with_products(
         # 3. Commit Both Operations
         conn.commit()
 
-        return order_data,product_data 
+        return order_data, product_data
 
     except ConnectionError:
         raise
@@ -126,6 +131,7 @@ def get_order_by_id(order_id: UUID):
                 order_id,
                 customer_id,
                 invoice_id,
+                address_id,
                 status,
                 estimated_delivery_date,
                 created_at,
@@ -157,7 +163,6 @@ def get_order_by_id(order_id: UUID):
         release_db_connection(conn, cur)
 
 
-
 def update_order_status_by_id(
     order_id: UUID,
     status: str,
@@ -178,6 +183,7 @@ def update_order_status_by_id(
                 order_id,
                 customer_id,
                 invoice_id,
+                address_id,
                 status,
                 estimated_delivery_date,
                 created_at,
@@ -311,15 +317,21 @@ def list_products_by_id(order_id: UUID):
         cur.execute(
             """
             SELECT
-                product_item_id,
-                order_id,
-                name,
-                quantity,
-                returnable,
-                created_at
-            FROM product_item
-            WHERE order_id = %s
-            ORDER BY created_at ASC
+                pi.product_item_id,
+                pi.order_id,
+                pi.product_id,
+                p.name,
+                p.category,
+                p.sub_category,
+                p.price,
+                p.image_url,
+                pi.quantity,
+                pi.returnable,
+                pi.created_at
+            FROM product_item pi
+            LEFT JOIN product p ON pi.product_id = p.product_id
+            WHERE pi.order_id = %s
+            ORDER BY pi.created_at ASC
             """,
             (str(order_id),)
         )

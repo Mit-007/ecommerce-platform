@@ -154,6 +154,7 @@ def get_orders_by_invoice_id(invoice_id: UUID):
                 order_id,
                 customer_id,
                 invoice_id,
+                address_id,
                 status,
                 estimated_delivery_date,
                 created_at,

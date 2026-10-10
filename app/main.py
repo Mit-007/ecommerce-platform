@@ -10,6 +10,8 @@ from app.routes import (
     invoice_routes ,
     tracking_routes ,
     document_routes,
+    product_routes,
+    address_routes,
 )
 from app.services.llm_service import initialize_llm
 from app.services.prompt_template import initialize_prompt_templates
@@ -64,3 +66,5 @@ app.include_router(order_routes.router)
 app.include_router(tracking_routes.router)
 app.include_router(conversation_routes.router)
 app.include_router(document_routes.router)
+app.include_router(product_routes.router)
+app.include_router(address_routes.router)

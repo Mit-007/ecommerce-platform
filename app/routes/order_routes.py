@@ -31,9 +31,10 @@ def create_order(request: CreateOrder,current_customer: dict = Depends(get_curre
                 detail="Access forbidden: You cannot create an order for another customer.",
             )
 
-        order_data,product_data = create_order_with_products(
+        order_data, product_data = create_order_with_products(
             customer_id=request.customer_id,
             invoice_id=request.invoice_id,
+            address_id=request.address_id,
             status=request.status.value if hasattr(request.status, "value") else request.status,
             estimated_delivery_date=request.estimated_delivery_date,
             products_list=request.product_list,
